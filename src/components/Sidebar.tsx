@@ -93,12 +93,10 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
         <div className="window-drag flex items-center px-4 pt-5 pb-4 border-b border-border shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0">
-              <img src="/dorothy-without-text.png" alt="Echelon" className="w-full h-full object-cover scale-150" />
+              <img src="/brand/echelon-icon.svg" alt="Echelon" className="w-full h-full object-contain" />
             </div>
             {showLabels && (
-              <div>
-                <img src="/text.png" alt="Echelon" className="h-6 w-auto object-contain" />
-              </div>
+              <span className="text-sm font-semibold uppercase tracking-widest text-foreground">Echelon</span>
             )}
           </div>
         </div>
@@ -268,9 +266,9 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
           <div className="h-14 flex items-center px-4 border-b border-border">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0">
-                <img src="/dorothy-without-text.png" alt="Echelon" className="w-full h-full object-cover scale-150" />
+                <img src="/brand/echelon-icon.svg" alt="Echelon" className="w-full h-full object-contain" />
               </div>
-              <img src="/text.png" alt="Echelon" className="h-6 w-auto object-contain" />
+              <span className="text-sm font-semibold uppercase tracking-widest text-foreground">Echelon</span>
             </div>
           </div>
 

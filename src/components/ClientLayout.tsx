@@ -208,9 +208,9 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
         </button>
         <div className="flex items-center gap-2 ml-2">
           <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0">
-            <img src="/dorothy-without-text.png" alt="Echelon" className="w-full h-full object-cover scale-150" />
+            <img src="/brand/echelon-icon.svg" alt="Echelon" className="w-full h-full object-contain" />
           </div>
-          <span className="text-base font-semibold tracking-wide text-foreground" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>Echelon</span>
+          <span className="text-sm font-semibold uppercase tracking-widest text-foreground">Echelon</span>
         </div>
       </div>
 
@@ -261,7 +261,7 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0">
-                  <img src="/dorothy-without-text.png" alt="Echelon" className="w-full h-full object-cover scale-150" />
+                  <img src="/brand/echelon-icon.svg" alt="Echelon" className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">Update Available</h3>
