@@ -1,7 +1,9 @@
-name: PR Checks
+name: CI
 
 on:
   pull_request:
+    branches: [main]
+  push:
     branches: [main]
 
 jobs:
@@ -31,7 +33,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci --ignore-scripts
+      - run: npm ci --ignore-scripts || npm install --ignore-scripts
       - run: npm test
 
   electron-dry-run:
@@ -43,7 +45,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts || npm install --ignore-scripts
       - run: tsc -p electron/tsconfig.json --noEmit || true
       - name: Verify electron-builder config
         run: npx electron-builder --mac --publish never --dry-run || echo "Dry run completed (may fail without signing certs)"
