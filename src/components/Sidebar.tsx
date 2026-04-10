@@ -25,10 +25,6 @@ import {
 import { useEffect, useState } from 'react';
 import { LATEST_RELEASE, WHATS_NEW_STORAGE_KEY } from '@/data/changelog';
 
-// Custom icon component for Pallet Town using the pokemon logo
-const PalletTownIcon = ({ className }: { className?: string }) => (
-  <img src="/pokemon/p.png" alt="" className={className} style={{ imageRendering: 'pixelated', objectFit: 'contain' }} />
-);
 import { useStore } from '@/store';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -46,7 +42,6 @@ const navItems = [
   { href: '/automations', icon: Zap, label: 'Automations', shortcut: '9' },
   { href: '/usage', icon: BarChart2, label: 'Usage', shortcut: '0' },
   { href: '/memory', icon: Brain, label: 'Memory', shortcut: 'M' },
-  { href: '/pallet-town', icon: PalletTownIcon, label: 'ClaudeMon' },
 ];
 
 interface SidebarProps {

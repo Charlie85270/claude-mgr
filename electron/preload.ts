@@ -679,6 +679,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     status: () => ipcRenderer.invoke('kb:status'),
   },
 
+  // Convener (season leader)
+  convener: {
+    get: (seasonId: string) => ipcRenderer.invoke('convener:get', seasonId),
+    invokeCounselor: (seasonId: string, placement: string, context: string) =>
+      ipcRenderer.invoke('convener:invoke-counselor', seasonId, placement, context),
+  },
+
   // Seasons (Echelon)
   season: {
     list: () => ipcRenderer.invoke('season:list'),
@@ -692,6 +699,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.on('season:updated', listener);
       return () => ipcRenderer.removeListener('season:updated', listener);
     },
+  },
+
+  // Counselor (multi-model consensus)
+  counselor: {
+    invoke: (placement: string, context: string) =>
+      ipcRenderer.invoke('counselor:invoke', placement, context),
+    placements: () =>
+      ipcRenderer.invoke('counselor:placements'),
+    history: () =>
+      ipcRenderer.invoke('counselor:history'),
   },
 
   // Platform info

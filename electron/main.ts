@@ -93,9 +93,10 @@ import { registerCLIPathsHandlers } from './handlers/cli-paths-handlers';
 import { registerKanbanHandlers } from './handlers/kanban-handlers';
 import { registerVaultHandlers } from './handlers/vault-handlers';
 import { registerReviewGateHandlers } from './handlers/review-gate-handlers';
-import { registerWorldHandlers } from './handlers/world-handlers';
 import { registerKbHandlers } from './handlers/kb-handlers';
+import { registerConvenerHandlers } from './handlers/convener-handlers';
 import { registerSeasonHandlers } from './handlers/season-handlers';
+import { registerCounselorHandlers } from './handlers/counselor-handlers';
 import { initVaultDb, closeVaultDb } from './services/vault-db';
 import { initAutoUpdater, checkForUpdates, setMainWindowGetter } from './services/update-checker';
 import { initKanbanAutomation, findMatchingAgent, createAgentForTask, startAgentForTask } from './services/kanban-automation';
@@ -430,14 +431,17 @@ app.whenReady().then(async () => {
   // Register review gate handlers
   registerReviewGateHandlers({ getMainWindow });
 
-  // Register world (generative zone) handlers
-  registerWorldHandlers({ getMainWindow });
+  // Register convener (season leader) handlers
+  registerConvenerHandlers({ getMainWindow });
 
   // Register KB (Knowledge Base / mempalace bridge) handlers
   registerKbHandlers({ getMainWindow });
 
   // Register season (Echelon) handlers
   registerSeasonHandlers({ getMainWindow });
+
+  // Register counselor (multi-model consensus) handlers
+  registerCounselorHandlers({ getMainWindow, getAppSettings: () => appSettings });
 
   // Initialize kanban automation service
   initKanbanAutomation({
