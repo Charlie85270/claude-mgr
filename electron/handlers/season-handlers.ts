@@ -47,11 +47,8 @@ export function registerSeasonHandlers(deps: SeasonHandlerDependencies): void {
     name: string;
     theme: string;
     rosterEntries: Array<{
-      character_slug: string;
-      archetype_id: string;
-      canon_name: string;
-      theme: string;
-      soul_package_path: string;
+      archetype: string;
+      character: string;
       capabilities: string[];
     }>;
   }) => {

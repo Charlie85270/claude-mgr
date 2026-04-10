@@ -25,6 +25,7 @@ export default function SeasonsPage() {
     try {
       setLoading(true);
       const api = (window as unknown as { electronAPI: any }).electronAPI;
+      if (!api?.season) { setSeasons([]); return; }
       const result = await api.season.list();
       setSeasons(result.seasons || []);
     } catch (err) {
@@ -39,6 +40,7 @@ export default function SeasonsPage() {
 
     // Subscribe to season updates
     const api = (window as unknown as { electronAPI: any }).electronAPI;
+    if (!api?.season) return;
     const unsub = api.season.onUpdated((season: Season) => {
       setSeasons(prev => {
         const idx = prev.findIndex(s => s.id === season.id);
