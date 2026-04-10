@@ -89,6 +89,7 @@ export interface AppSettings {
   favoriteProjects?: string[];
   hiddenProjects?: string[];
   defaultProjectPath?: string;
+  grokApiKey?: string;
 }
 
-export type SettingsSection = 'general' | 'terminal' | 'git' | 'notifications' | 'telegram' | 'slack' | 'jira' | 'socialdata' | 'tasmania' | 'opencode' | 'pi' | 'google-workspace' | 'obsidian' | 'permissions' | 'skills' | 'mcp' | 'cli' | 'system';
+export type SettingsSection = 'general' | 'terminal' | 'git' | 'notifications' | 'telegram' | 'slack' | 'jira' | 'socialdata' | 'tasmania' | 'opencode' | 'pi' | 'google-workspace' | 'obsidian' | 'permissions' | 'skills' | 'mcp' | 'cli' | 'system' | 'counselor';

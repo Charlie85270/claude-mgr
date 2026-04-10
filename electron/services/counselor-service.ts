@@ -243,14 +243,76 @@ export function listPlacements() {
 }
 
 /**
- * Attempt to retrieve model API keys from app settings.
- * Stub: checks if keys exist, returns whatever is available.
+ * Resolve model API keys from CLI auth configs and app settings.
+ *
+ * - Anthropic: ANTHROPIC_API_KEY env var (set when Claude CLI is configured)
+ * - OpenAI: access_token from ~/.codex/auth.json (Codex CLI OAuth)
+ * - Gemini: GOOGLE_API_KEY or GEMINI_API_KEY env var, or gcloud ADC
+ * - Grok: dedicated field in app settings (no CLI tool to piggyback on)
  */
 export function resolveModelKeys(appSettings: Record<string, unknown>): ModelKeys {
   return {
-    geminiKey: (appSettings.geminiApiKey as string) || undefined,
-    openaiKey: (appSettings.openaiApiKey as string) || undefined,
-    anthropicKey: (appSettings.anthropicApiKey as string) || undefined,
+    anthropicKey: resolveAnthropicKey(),
+    openaiKey: resolveOpenAIKey(),
+    geminiKey: resolveGeminiKey(),
     grokKey: (appSettings.grokApiKey as string) || undefined,
   };
+}
+
+function resolveAnthropicKey(): string | undefined {
+  // 1. Environment variable (standard Anthropic SDK pattern)
+  if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY;
+
+  // 2. Check ~/.anthropic/config if it exists
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const configPath = path.join(require('os').homedir(), '.anthropic', 'config.json');
+    if (fs.existsSync(configPath)) {
+      const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+      if (config.api_key) return config.api_key;
+    }
+  } catch { /* ignore */ }
+
+  return undefined;
+}
+
+function resolveOpenAIKey(): string | undefined {
+  // 1. Environment variable
+  if (process.env.OPENAI_API_KEY) return process.env.OPENAI_API_KEY;
+
+  // 2. Codex CLI auth — uses OAuth access_token
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const authPath = path.join(require('os').homedir(), '.codex', 'auth.json');
+    if (fs.existsSync(authPath)) {
+      const auth = JSON.parse(fs.readFileSync(authPath, 'utf-8'));
+      // Prefer explicit API key, fall back to OAuth access token
+      if (auth.OPENAI_API_KEY) return auth.OPENAI_API_KEY;
+      if (auth.tokens?.access_token) return auth.tokens.access_token;
+    }
+  } catch { /* ignore */ }
+
+  return undefined;
+}
+
+function resolveGeminiKey(): string | undefined {
+  // 1. Environment variables (Google AI Studio / Vertex patterns)
+  if (process.env.GEMINI_API_KEY) return process.env.GEMINI_API_KEY;
+  if (process.env.GOOGLE_API_KEY) return process.env.GOOGLE_API_KEY;
+
+  // 2. gcloud application default credentials (ADC)
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const adcPath = path.join(require('os').homedir(), '.config', 'gcloud', 'application_default_credentials.json');
+    if (fs.existsSync(adcPath)) {
+      const adc = JSON.parse(fs.readFileSync(adcPath, 'utf-8'));
+      // ADC uses OAuth — return the client_id as a signal that auth exists
+      if (adc.client_id) return `adc:${adc.client_id}`;
+    }
+  } catch { /* ignore */ }
+
+  return undefined;
 }

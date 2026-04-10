@@ -11,6 +11,7 @@ import {
   Cloud,
   Cpu,
   Plug,
+  Scale,
 } from 'lucide-react';
 import { SlackIcon } from './SlackIcon';
 import { JiraIcon } from './JiraIcon';
@@ -32,6 +33,7 @@ export const SECTIONS: { id: SettingsSection; label: string; icon: React.Compone
   { id: 'opencode', label: 'OpenCode', icon: Cpu },
   { id: 'pi', label: 'Pi Terminal', icon: Cpu },
   { id: 'google-workspace', label: 'Google Workspace', icon: Cloud },
+  { id: 'counselor', label: 'Counselor', icon: Scale },
   { id: 'permissions', label: 'Permissions', icon: Shield },
   { id: 'skills', label: 'Skills & Plugins', icon: Sparkles },
   { id: 'mcp', label: 'Custom MCP', icon: Plug },

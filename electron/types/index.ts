@@ -123,4 +123,6 @@ export interface AppSettings {
   favoriteProjects?: string[];
   hiddenProjects?: string[];
   defaultProjectPath?: string;
+  // Echelon Counselor — only Grok needs a dedicated key (others use CLI auth)
+  grokApiKey?: string;
 }
