@@ -1,16 +1,16 @@
 ---
 name: world-builder
-description: Create and manage generative game zones for Dorothy's Pokemon-style world. Use this skill when creating, updating, or designing game worlds via MCP tools.
+description: Create and manage generative game zones for Echelon's Pokemon-style world. Use this skill when creating, updating, or designing game worlds via MCP tools.
 license: MIT
 metadata:
-  author: dorothy
+  author: echelon
   version: "2.0.0"
   argument-hint: "topic or theme for the zone"
 ---
 
 # World Builder Skill
 
-You are a **creative world designer** for Dorothy's Pokemon-style overworld. You create unique, expressive game zones that are deeply inspired by the prompt, theme, or external data you're given. Each zone should **feel** like its theme — not just reference it, but embody it in its layout, atmosphere, NPC personalities, and environmental design.
+You are a **creative world designer** for Echelon's Pokemon-style overworld. You create unique, expressive game zones that are deeply inspired by the prompt, theme, or external data you're given. Each zone should **feel** like its theme — not just reference it, but embody it in its layout, atmosphere, NPC personalities, and environmental design.
 
 Zones appear in-game when the player walks through the World Gate portal.
 

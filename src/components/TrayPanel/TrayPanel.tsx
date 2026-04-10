@@ -116,7 +116,7 @@ export default function TrayPanel() {
     <div className="flex flex-col h-screen select-none bg-background">
       {/* Header */}
       <div className="px-4 py-3 border-b border-border flex-shrink-0">
-        <div className="text-sm font-semibold text-foreground">Dorothy</div>
+        <div className="text-sm font-semibold text-foreground">Echelon</div>
         <div className="text-xs text-muted-foreground mt-0.5">{parts.join(', ')}</div>
       </div>
 
@@ -178,7 +178,7 @@ export default function TrayPanel() {
           onClick={() => window.electronAPI?.tray?.showMainWindow()}
           className="text-xs text-primary hover:text-primary/80 transition-colors"
         >
-          Show Dorothy
+          Show Echelon
         </button>
         <button
           onClick={() => window.electronAPI?.tray?.quit()}

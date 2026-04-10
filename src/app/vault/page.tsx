@@ -6,7 +6,7 @@ import ObsidianVaultView from '@/components/ObsidianVaultView';
 import { ObsidianIcon } from '@/components/Settings/ObsidianIcon';
 
 export default function VaultPage() {
-  const [activeTab, setActiveTab] = useState<'dorothy' | 'obsidian'>('dorothy');
+  const [activeTab, setActiveTab] = useState<'echelon' | 'obsidian'>('echelon');
 
   return (
     <div className="h-[calc(100vh-7rem)] lg:h-[calc(100vh-3rem)] flex flex-col pt-4 lg:pt-6">
@@ -23,17 +23,17 @@ export default function VaultPage() {
       {/* Filter buttons — same style as ProjectFilterTabs */}
       <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2">
         <button
-          onClick={() => setActiveTab('dorothy')}
+          onClick={() => setActiveTab('echelon')}
           className={`
             flex items-center gap-2 px-3 py-2 text-sm font-medium transition-all whitespace-nowrap
-            ${activeTab === 'dorothy'
+            ${activeTab === 'echelon'
               ? 'bg-foreground text-background'
               : 'bg-secondary text-muted-foreground hover:text-foreground border border-border'
             }
           `}
         >
-          <img src="/dorothy-without-text.png" alt="Dorothy" className="w-4 h-4 object-contain" />
-          Dorothy Vault
+          <img src="/dorothy-without-text.png" alt="Echelon" className="w-4 h-4 object-contain" />
+          Echelon Vault
         </button>
         <button
           onClick={() => setActiveTab('obsidian')}
@@ -52,7 +52,7 @@ export default function VaultPage() {
 
       {/* Content */}
       <div className="flex-1 min-h-0 overflow-hidden">
-        {activeTab === 'dorothy' ? <VaultView embedded /> : <ObsidianVaultView />}
+        {activeTab === 'echelon' ? <VaultView embedded /> : <ObsidianVaultView />}
       </div>
     </div>
   );

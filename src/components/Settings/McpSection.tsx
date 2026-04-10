@@ -241,7 +241,7 @@ export function McpSection() {
       <div>
         <h2 className="text-lg font-semibold mb-1">Custom MCP Servers</h2>
         <p className="text-sm text-muted-foreground">
-          View and edit MCP server configurations installed via CLI commands. Dorothy-managed servers are hidden.
+          View and edit MCP server configurations installed via CLI commands. Echelon-managed servers are hidden.
         </p>
       </div>
 

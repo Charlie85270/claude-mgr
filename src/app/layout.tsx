@@ -3,13 +3,13 @@ import "./globals.css";
 import ClientLayout from "@/components/ClientLayout";
 
 export const metadata: Metadata = {
-  title: "Dorothy | Agent Control Center",
+  title: "Echelon | Agent Control Center",
   description: "Manage and monitor your Claude Code agents, projects, and tasks in real-time",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Dorothy",
+    title: "Echelon",
   },
   formatDetection: {
     telephone: false,

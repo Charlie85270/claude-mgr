@@ -16,7 +16,7 @@ export default function WhatsNewPage() {
     <div className="flex-1 overflow-y-auto p-6 max-w-2xl mx-auto w-full">
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-1">What&apos;s New</h1>
-        <p className="text-sm text-muted-foreground">Release history and recent improvements to Dorothy</p>
+        <p className="text-sm text-muted-foreground">Release history and recent improvements to Echelon</p>
       </div>
 
       <div className="relative">

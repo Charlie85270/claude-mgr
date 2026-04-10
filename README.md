@@ -1,10 +1,10 @@
 # Echelon
 
-A desktop app for orchestrating AI agent teams. Deploy themed squads of specialized agents, coordinate them through review gates and a multi-model counselor, and manage everything from one interface. Built on [Dorothy](https://github.com/Charlie85270/Dorothy) by Charlie85270.
+A [Titan's Rift](https://titansrift.com/) creation. A desktop app for orchestrating AI agent teams. Deploy themed squads of specialized agents, coordinate them through review gates and a multi-model counselor, and manage everything from one interface.
 
 ## What Echelon Adds
 
-Echelon extends Dorothy's parallel agent management with the **factor-echelon** team-factory system:
+Echelon extends the base platform with the **factor-echelon** team-factory system:
 
 - **Seasons** — themed team compositions (e.g., Big Bang Theory, Star Wars) that define how agents are cast, named, and coordinated
 - **Characters** — specialized agent personas built from archetypes, each with a 7-file soul package (SOUL.md, AGENTS.md, HEARTBEAT.md, etc.)
@@ -13,7 +13,7 @@ Echelon extends Dorothy's parallel agent management with the **factor-echelon** 
 - **Knowledge Base** — persistent team memory via mempalace integration
 - **Multi-target builds** — the same team definitions compile to Claude Code plugins, OpenClaw agents, or Echelon season packs
 
-## Core Features (from Dorothy)
+## Core Features
 
 - **Parallel agent management** — run 10+ agents simultaneously across different projects
 - **Super Agent orchestrator** — a meta-agent that delegates and coordinates work across your agent pool
@@ -107,7 +107,7 @@ bun run skill:build      # Build skill pipeline
 
 ## Upstream
 
-Echelon is a fork of [Dorothy](https://github.com/Charlie85270/Dorothy) by [Charlie85270](https://github.com/Charlie85270). The upstream remote tracks the original repo for pulling in new features and fixes.
+Echelon is a fork of [Dorothy](https://github.com/Charlie85270/Dorothy) by [Charlie85270](https://github.com/Charlie85270), extended by [Titan's Rift](https://titansrift.com/). The upstream remote tracks the original repo for pulling in new features and fixes.
 
 ## Design Specification
 

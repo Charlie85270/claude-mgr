@@ -3,12 +3,12 @@ import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Dorothy - Your AI Agents, Perfectly Managed",
-  description: "A beautiful desktop app to manage, monitor, and orchestrate your AI coding agents. Supports Claude, Codex, and Gemini. Free, open source, and delightfully retro.",
-  keywords: ["Dorothy", "Claude", "Codex", "Gemini", "AI", "Agent", "Manager", "Claude Code", "OpenAI", "Google"],
+  title: "Echelon - Your AI Agents, Perfectly Managed",
+  description: "A Titan's Rift creation. Orchestrate AI agent teams with themed seasons, review gates, and a multi-model counselor. Free and open source.",
+  keywords: ["Echelon", "Team Factory Echelon", "Titan's Rift", "Claude", "Codex", "Gemini", "AI", "Agent", "Manager", "Claude Code"],
   icons: { icon: "/dorothy/favicon-32.png", apple: "/dorothy/icon-192.png" },
   openGraph: {
-    title: "Dorothy - Your AI Agents, Perfectly Managed",
+    title: "Echelon - Your AI Agents, Perfectly Managed",
     description: "A beautiful desktop app to manage and orchestrate your AI coding agents. Supports Claude, Codex, and Gemini.",
     type: "website",
   },

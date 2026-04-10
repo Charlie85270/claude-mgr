@@ -56,7 +56,7 @@ export const OpenCodeSection = ({ appSettings, onSaveAppSettings, onUpdateLocalS
             <div>
               <p className="font-medium">Enable OpenCode</p>
               <p className="text-sm text-muted-foreground">
-                Use OpenCode CLI as an agent provider in Dorothy
+                Use OpenCode CLI as an agent provider in Echelon
               </p>
             </div>
           </div>

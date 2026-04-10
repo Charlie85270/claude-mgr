@@ -40,7 +40,7 @@ export default function SupportPage() {
             <Heart className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-2xl lg:text-3xl font-bold tracking-tight mb-3">
-            Support Dorothy
+            Support Echelon
           </h1>
           <p className="text-muted-foreground text-sm lg:text-base max-w-lg mx-auto">
             Help us keep building the future of AI agent management.
@@ -54,17 +54,17 @@ export default function SupportPage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="bg-card border border-border rounded-xl p-6 mb-8"
         >
-          <h2 className="text-lg font-semibold mb-3">Why Dorothy?</h2>
+          <h2 className="text-lg font-semibold mb-3">Why Echelon?</h2>
           <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
             <p>
-              Dorothy started as a simple idea: give developers a beautiful, powerful desktop app
+              Echelon started as a simple idea: give developers a beautiful, powerful desktop app
               to orchestrate their AI coding agents. What began as a side project has grown into
               something we use every day — and so do hundreds of others.
             </p>
             <p>
-              We're a small team pouring real energy into Dorothy — new integrations, better UX,
+              We're a small team pouring real energy into Echelon — new integrations, better UX,
               and features that make AI-assisted development feel effortless. Your support helps
-              us dedicate more time to building, covering infrastructure costs, and keeping Dorothy
+              us dedicate more time to building, covering infrastructure costs, and keeping Echelon
               free and open.
             </p>
             <p>

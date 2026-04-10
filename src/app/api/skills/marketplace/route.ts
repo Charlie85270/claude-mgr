@@ -27,7 +27,7 @@ export async function GET() {
   try {
     const res = await fetch('https://skills.sh/', {
       next: { revalidate: 3600 },
-      headers: { 'User-Agent': 'Dorothy/1.0' },
+      headers: { 'User-Agent': 'Echelon/1.0' },
     });
 
     if (!res.ok) {

@@ -575,7 +575,7 @@ export default function AgentKnowledgeGraph() {
 
       // Only include the CLAUDE.md files that are actually loaded per agent:
       // - ~/.claude/CLAUDE.md  (global Claude config)
-      // - ~/.dorothy/CLAUDE.md (global Dorothy config)
+      // - ~/.dorothy/CLAUDE.md (global Echelon config)
       // - {projectPath}/CLAUDE.md and {projectPath}/.claude/CLAUDE.md per agent
       const cmds = [
         `[ -f "$HOME/.claude/CLAUDE.md" ] && echo "$HOME/.claude/CLAUDE.md"`,

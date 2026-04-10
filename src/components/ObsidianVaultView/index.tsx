@@ -247,7 +247,7 @@ export default function ObsidianVaultView() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* Header — search + action, same layout as Dorothy Vault */}
+      {/* Header — search + action, same layout as Echelon Vault */}
       <div className="flex items-center gap-3 mb-4 shrink-0">
         {viewMode === 'list' && (
           <>

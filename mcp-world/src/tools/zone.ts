@@ -185,7 +185,7 @@ export function registerZoneTools(server: McpServer): void {
   // ── create_zone ──────────────────────────────────────────────────────────
   server.tool(
     "create_zone",
-    `Create or replace a full game zone. The zone appears in Dorothy's Pokemon-style game world.
+    `Create or replace a full game zone. The zone appears in Echelon's Pokemon-style game world.
 
 TILE LEGEND (use these numbers in the tilemap):
   0=GRASS (walkable), 1=TREE (solid border/obstacle), 2=PATH (walkable),

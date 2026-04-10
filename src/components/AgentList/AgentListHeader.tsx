@@ -21,7 +21,7 @@ export function AgentListHeader({
       <div>
         <h1 className="text-xl lg:text-2xl font-bold tracking-tight text-foreground">AI Agents Control Center</h1>
         <p className="text-muted-foreground text-xs lg:text-sm mt-1 hidden sm:block">
-          Dorothy is watching you AI Agents.
+          Echelon is watching your AI Agents.
         </p>
       </div>
       <div className="flex items-center gap-2">

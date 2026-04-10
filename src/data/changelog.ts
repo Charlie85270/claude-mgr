@@ -41,9 +41,9 @@ export const CHANGELOG: Release[] = [
       'Add support of JIRA self hosted domain',
       'Added macOS menu bar tray with live agent status panel',
       'Status tabs in tray: Working, Waiting for inputs, Ready to work, Idle',
-      'Manage all your external MCP servers (outside of Dorothy) from the settings page',
+      'Manage all your external MCP servers (outside of Echelon) from the settings page',
       'Live task preview next to agent name when working or waiting',
-      'Full-color Dorothy logo in the macOS menu bar',
+      'Full-color Echelon logo in the macOS menu bar',
       'Revamped agents page with improved layout and filtering',
       'Add new Status line option (in settings) to display model, context usage, git branch, session time, and token stats in live on your Claude Code terminal',
       'Custom MP3/audio file support per notification type',
@@ -72,7 +72,7 @@ export const CHANGELOG: Release[] = [
     updates: [
       'React app preview tab in agent detail panel',
       'Live preview of react-app code blocks from agent output',
-      'File watcher for .dorothy-preview/ directory',
+      'File watcher for .echelon-preview/ directory',
       'Window drag regions for macOS',
       'Modular API routes for better maintainability',
     ],
@@ -129,7 +129,7 @@ export const CHANGELOG: Release[] = [
     version: '1.0.0',
     date: '2025-12-01',
     updates: [
-      'Initial release of Dorothy',
+      'Initial release of Echelon',
       'Multi-agent management with persistent PTY sessions',
       'Agent creation with project path, skills, and character',
       'Terminal view with live output streaming',
@@ -140,4 +140,4 @@ export const CHANGELOG: Release[] = [
 ];
 
 export const LATEST_RELEASE = CHANGELOG[0];
-export const WHATS_NEW_STORAGE_KEY = 'dorothy_whats_new_last_seen';
+export const WHATS_NEW_STORAGE_KEY = 'echelon_whats_new_last_seen';

@@ -207,7 +207,7 @@ function SettingsPageInner() {
         <div>
           <h1 className="text-xl lg:text-2xl font-bold tracking-tight">Settings</h1>
           <p className="text-muted-foreground text-xs lg:text-sm mt-1 hidden sm:block">
-            Configure Dorothy preferences
+            Configure Echelon preferences
           </p>
         </div>
         <div className="flex gap-2 sm:gap-3">

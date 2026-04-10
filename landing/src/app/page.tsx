@@ -39,7 +39,7 @@ export default function Home() {
       <nav className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
         <a href="#" className="flex items-center gap-2.5">
           <img src="/dorothy/dorothy-without-text.png" alt="" width={32} height={32} className="w-10 h-10 scale-100 rounded-full" />
-          <img src="/dorothy/text.png" alt="Dorothy" width={90} height={90} className="w-[90px] bg-transparent h-auto object-contain" />
+          <img src="/dorothy/text.png" alt="Echelon" width={90} height={90} className="w-[90px] bg-transparent h-auto object-contain" />
         </a>
         <div className="hidden md:flex items-center gap-8 text-[13px] text-brown-light">
           <a href="#features" className="hover:text-brown transition-colors">Features</a>
@@ -50,7 +50,7 @@ export default function Home() {
           <a href="https://x.com/aidorothy1" target="_blank" rel="noopener noreferrer" className="text-brown-light hover:text-brown transition-colors">
             <svg className="w-[16px] h-[16px]" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
           </a>
-          <a href="https://github.com/Charlie85270/Dorothy" target="_blank" rel="noopener noreferrer" className="text-brown-light hover:text-brown transition-colors">
+          <a href="https://github.com/jediswimmer/Echelon" target="_blank" rel="noopener noreferrer" className="text-brown-light hover:text-brown transition-colors">
             <Github className="w-[18px] h-[18px]" />
           </a>
           <a href="#download" className="hidden sm:flex items-center gap-1.5 px-4 py-2 bg-teal text-white text-[13px] font-medium rounded-full hover:bg-teal-dark transition-colors">
@@ -77,7 +77,7 @@ export default function Home() {
 
             <p className="text-brown-light text-[15px] leading-relaxed mb-8 max-w-md mx-auto lg:mx-0">
               AI agents are powerful but they can quickly become overwhelming.<br />
-              Dorothy is here to keep everything under control.
+              Echelon is here to keep everything under control.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-3 justify-center lg:justify-start">
@@ -103,7 +103,7 @@ export default function Home() {
           <div className="relative shrink-0">
             <Image
               src="/dorothy/background-2.png"
-              alt="Dorothy and Developer"
+              alt="Echelon and Developer"
               width={520}
               height={300}
               className="rounded-2xl w-[360px] md:w-[680px] h-auto object-cover drop-shadow-lg"
@@ -157,7 +157,7 @@ export default function Home() {
           <p className="font-display italic text-teal text-base mb-2">Multi-provider</p>
           <h2 className="font-display text-4xl md:text-5xl">Works with your favorite AI</h2>
           <p className="text-brown-light text-[15px] mt-4 max-w-lg mx-auto">
-            Dorothy supports multiple AI coding agents. Run them side-by-side, mix and match per project.
+            Echelon supports multiple AI coding agents. Run them side-by-side, mix and match per project.
           </p>
         </div>
 
@@ -192,7 +192,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <p className="font-display italic text-teal text-base mb-2">See it in action</p>
-            <h2 className="font-display text-4xl md:text-5xl">A peek inside Dorothy</h2>
+            <h2 className="font-display text-4xl md:text-5xl">A peek inside Echelon</h2>
           </div>
 
           {/* Main screenshot */}
@@ -202,9 +202,9 @@ export default function Home() {
               <div className="w-2.5 h-2.5 rounded-full bg-rust/50" />
               <div className="w-2.5 h-2.5 rounded-full bg-mustard/50" />
               <div className="w-2.5 h-2.5 rounded-full bg-teal/50" />
-              <span className="text-[10px] text-brown-light/60 ml-2">Dorothy</span>
+              <span className="text-[10px] text-brown-light/60 ml-2">Echelon</span>
             </div>
-            <Image src="/0.png" alt="Dorothy Dashboard" width={960} height={600} className="w-full h-auto" />
+            <Image src="/0.png" alt="Echelon Dashboard" width={960} height={600} className="w-full h-auto" />
           </div>
         </div>
       </section>
@@ -213,7 +213,7 @@ export default function Home() {
       <section className="max-w-3xl mx-auto px-6 py-20 md:py-24 text-center">
         <div className="w-12 h-px bg-teal mx-auto mb-8" />
         <blockquote className="font-display italic text-2xl md:text-3xl leading-snug mb-6">
-          &ldquo;Dorothy makes managing AI agents a breeze!&rdquo;
+          &ldquo;Echelon makes managing AI agents a breeze!&rdquo;
         </blockquote>
         <p className="text-sm text-brown-light">— A Happy Developer</p>
         <div className="w-12 h-px bg-teal mx-auto mt-8" />
@@ -222,9 +222,9 @@ export default function Home() {
       {/* ───────── DOWNLOAD CTA ───────── */}
       <section id="download" className="bg-teal text-white py-20 md:py-24 px-6">
         <div className="max-w-2xl mx-auto text-center">
-          <Image src="/dorothy/dorothy-without-text.png" alt="Dorothy" width={64} height={64} className="w-16 h-16 mx-auto rounded-full mb-6 ring-4 ring-white/20 object-cover" />
+          <Image src="/dorothy/dorothy-without-text.png" alt="Echelon" width={64} height={64} className="w-16 h-16 mx-auto rounded-full mb-6 ring-4 ring-white/20 object-cover" />
 
-          <h2 className="font-display text-3xl md:text-5xl mb-3">Ready to meet Dorothy?</h2>
+          <h2 className="font-display text-3xl md:text-5xl mb-3">Ready to meet Echelon?</h2>
           <p className="text-white/70 text-[15px] mb-8 max-w-md mx-auto">
             Free, open source, no account needed. Download and start managing your AI agents today.
           </p>
@@ -251,12 +251,12 @@ export default function Home() {
       <footer className="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-warm">
         <div className="flex items-center gap-2">
           <img src="/dorothy/dorothy-without-text.png" alt="" width={20} height={20} className="w-5 h-5 rounded-full object-cover" />
-          <img src="/dorothy/text.png" alt="Dorothy" width={64} height={64} className="w-16 h-auto bg-transparent object-contain opacity-60" />
+          <img src="/dorothy/text.png" alt="Echelon" width={64} height={64} className="w-16 h-auto bg-transparent object-contain opacity-60" />
         </div>
         <div className="flex items-center gap-6 text-[12px] text-brown-light">
           <a href="https://x.com/aidorothy1" target="_blank" rel="noopener noreferrer" className="hover:text-brown transition-colors">X / Twitter</a>
-          <a href="https://github.com/Charlie85270/Dorothy" target="_blank" rel="noopener noreferrer" className="hover:text-brown transition-colors">GitHub</a>
-          <a href="https://github.com/Charlie85270/Dorothy/issues" target="_blank" rel="noopener noreferrer" className="hover:text-brown transition-colors">Issues</a>
+          <a href="https://github.com/jediswimmer/Echelon" target="_blank" rel="noopener noreferrer" className="hover:text-brown transition-colors">GitHub</a>
+          <a href="https://github.com/jediswimmer/Echelon/issues" target="_blank" rel="noopener noreferrer" className="hover:text-brown transition-colors">Issues</a>
           <a href="https://skills.sh" target="_blank" rel="noopener noreferrer" className="hover:text-brown transition-colors">skills.sh</a>
         </div>
         <p className="text-[11px] text-brown-light/50">Made with &#9829; for the AI agents community</p>

@@ -142,7 +142,7 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
 
   // Initialize dark mode from localStorage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('dorothy-dark-mode');
+    const saved = localStorage.getItem('echelon-dark-mode');
     if (saved === 'true') {
       setDarkMode(true);
     }
@@ -151,7 +151,7 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
   // Sync dark class on <html> and persist to localStorage
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
-    localStorage.setItem('dorothy-dark-mode', String(darkMode));
+    localStorage.setItem('echelon-dark-mode', String(darkMode));
   }, [darkMode]);
 
   // Global vault unread badge: listen for new documents even when VaultView is not mounted
@@ -208,9 +208,9 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
         </button>
         <div className="flex items-center gap-2 ml-2">
           <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0">
-            <img src="/dorothy-without-text.png" alt="Dorothy" className="w-full h-full object-cover scale-150" />
+            <img src="/dorothy-without-text.png" alt="Echelon" className="w-full h-full object-cover scale-150" />
           </div>
-          <span className="text-base font-semibold tracking-wide text-foreground" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>Dorothy</span>
+          <span className="text-base font-semibold tracking-wide text-foreground" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>Echelon</span>
         </div>
       </div>
 
@@ -261,12 +261,12 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0">
-                  <img src="/dorothy-without-text.png" alt="Dorothy" className="w-full h-full object-cover scale-150" />
+                  <img src="/dorothy-without-text.png" alt="Echelon" className="w-full h-full object-cover scale-150" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">Update Available</h3>
                   <p className="text-sm text-muted-foreground">
-                    Dorothy {updateInfo.latestVersion} is ready
+                    Echelon {updateInfo.latestVersion} is ready
                   </p>
                 </div>
               </div>
