@@ -50,6 +50,12 @@ export interface AgentStatus {
   localModel?: string;        // Tasmania model name when provider is 'local'
   savedPrompt?: string;       // Saved task/prompt for re-launching the agent
   obsidianVaultPaths?: string[]; // Obsidian vault paths to mount via --add-dir (read-only)
+  // Echelon character fields (optional — standalone agents don't set these)
+  seasonId?: string;           // Season this character belongs to
+  archetypeId?: string;        // e.g. 'ingestion-pm'
+  soulPackagePath?: string;    // Path to 7-file soul package directory
+  canonName?: string;          // Theme canon name (e.g. 'Penny', 'Leonard')
+  theme?: string;              // Theme slug (e.g. 'tbbt', 'star-wars')
 }
 
 export interface CLIPaths {

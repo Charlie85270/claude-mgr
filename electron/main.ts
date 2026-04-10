@@ -29,6 +29,8 @@ import {
   getMainWindow,
 } from './core/window-manager';
 
+import { loadSeasons, getAllSeasons } from './core/season-manager';
+
 import {
   agents,
   loadAgents,
@@ -334,6 +336,10 @@ app.whenReady().then(async () => {
 
   // Load agents from disk
   loadAgents();
+
+  // Load seasons from disk
+  loadSeasons();
+  console.log(`Loaded ${getAllSeasons().length} season(s)`);
 
   // Setup protocol handler for production
   setupProtocolHandler();
