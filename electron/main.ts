@@ -92,7 +92,10 @@ import { registerAutomationHandlers } from './handlers/automation-handlers';
 import { registerCLIPathsHandlers } from './handlers/cli-paths-handlers';
 import { registerKanbanHandlers } from './handlers/kanban-handlers';
 import { registerVaultHandlers } from './handlers/vault-handlers';
+import { registerReviewGateHandlers } from './handlers/review-gate-handlers';
 import { registerWorldHandlers } from './handlers/world-handlers';
+import { registerKbHandlers } from './handlers/kb-handlers';
+import { registerSeasonHandlers } from './handlers/season-handlers';
 import { initVaultDb, closeVaultDb } from './services/vault-db';
 import { initAutoUpdater, checkForUpdates, setMainWindowGetter } from './services/update-checker';
 import { initKanbanAutomation, findMatchingAgent, createAgentForTask, startAgentForTask } from './services/kanban-automation';
@@ -424,8 +427,17 @@ app.whenReady().then(async () => {
   // Register vault handlers
   registerVaultHandlers({ getMainWindow });
 
+  // Register review gate handlers
+  registerReviewGateHandlers({ getMainWindow });
+
   // Register world (generative zone) handlers
   registerWorldHandlers({ getMainWindow });
+
+  // Register KB (Knowledge Base / mempalace bridge) handlers
+  registerKbHandlers({ getMainWindow });
+
+  // Register season (Echelon) handlers
+  registerSeasonHandlers({ getMainWindow });
 
   // Initialize kanban automation service
   initKanbanAutomation({

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Brain,
@@ -303,6 +303,15 @@ export default function MemoryPage() {
   const [editingFile, setEditingFile] = useState<MemoryFile | null>(null);
   const [showNewFileModal, setShowNewFileModal] = useState(false);
   const [deletingFile, setDeletingFile] = useState<string | null>(null);
+  const [kbConnected, setKbConnected] = useState<boolean | null>(null);
+
+  // Check KB (mempalace) connection status on mount
+  useEffect(() => {
+    const w = window as unknown as { electronAPI?: { kb?: { status: () => Promise<{ connected: boolean }> } } };
+    if (w.electronAPI?.kb) {
+      w.electronAPI.kb.status().then((s) => setKbConnected(s.connected)).catch(() => setKbConnected(false));
+    }
+  }, []);
 
   const handleSelectProject = useCallback((project: ProjectMemory) => {
     selectProject(project);
@@ -351,7 +360,13 @@ export default function MemoryPage() {
         <div>
           <h1 className="text-xl lg:text-2xl font-bold tracking-tight flex items-center gap-2">
             <Brain className="w-6 h-6 text-primary" />
-            Memory
+            Knowledge Base
+            {kbConnected !== null && (
+              <span
+                className={`inline-block w-2.5 h-2.5 rounded-full ${kbConnected ? 'bg-green-500' : 'bg-gray-400'}`}
+                title={kbConnected ? 'mempalace connected' : 'mempalace not available (fallback mode)'}
+              />
+            )}
           </h1>
           <p className="text-muted-foreground text-xs lg:text-sm mt-1 hidden sm:block">
             Native Claude Code memory — per-project context that persists across sessions

@@ -655,6 +655,45 @@ contextBridge.exposeInMainWorld('electronAPI', {
     quit: () => ipcRenderer.invoke('tray:quit'),
   },
 
+  // Review Gates
+  reviewGate: {
+    run: (characterId: string, workSummary: string) =>
+      ipcRenderer.invoke('review-gate:run', characterId, workSummary),
+    status: (seasonId: string) =>
+      ipcRenderer.invoke('review-gate:status', seasonId),
+    list: () =>
+      ipcRenderer.invoke('review-gate:list'),
+    onUpdated: (callback: (results: unknown) => void) => {
+      const listener = (_: unknown, results: unknown) => callback(results);
+      ipcRenderer.on('review-gate:updated', listener);
+      return () => ipcRenderer.removeListener('review-gate:updated', listener);
+    },
+  },
+
+  // Knowledge Base (mempalace bridge)
+  kb: {
+    query: (tags: string[], semantic?: string) => ipcRenderer.invoke('kb:query', tags, semantic),
+    write: (entry: { content: string; tags: string[]; type: string; metadata?: Record<string, unknown> }) => ipcRenderer.invoke('kb:write', entry),
+    promoteSkill: (skillId: string) => ipcRenderer.invoke('kb:promote-skill', skillId),
+    audit: (event: { action: string; detail?: string; agentId?: string; metadata?: Record<string, unknown> }) => ipcRenderer.invoke('kb:audit', event),
+    status: () => ipcRenderer.invoke('kb:status'),
+  },
+
+  // Seasons (Echelon)
+  season: {
+    list: () => ipcRenderer.invoke('season:list'),
+    get: (id: string) => ipcRenderer.invoke('season:get', id),
+    spawn: (config: any) => ipcRenderer.invoke('season:spawn', config),
+    archive: (id: string) => ipcRenderer.invoke('season:archive', id),
+    restore: (id: string) => ipcRenderer.invoke('season:restore', id),
+    characters: (seasonId: string) => ipcRenderer.invoke('season:characters', seasonId),
+    onUpdated: (callback: (season: any) => void) => {
+      const listener = (_: unknown, season: any) => callback(season);
+      ipcRenderer.on('season:updated', listener);
+      return () => ipcRenderer.removeListener('season:updated', listener);
+    },
+  },
+
   // Platform info
   platform: process.platform,
 });

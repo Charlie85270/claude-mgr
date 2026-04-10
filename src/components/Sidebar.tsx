@@ -20,6 +20,7 @@ import {
   Brain,
   Gift,
   Heart,
+  Users,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { LATEST_RELEASE, WHATS_NEW_STORAGE_KEY } from '@/data/changelog';
@@ -34,6 +35,7 @@ import { usePathname } from 'next/navigation';
 
 const navItems = [
   { href: '/', icon: LayoutDashboard, label: 'Dashboard', shortcut: '1' },
+  { href: '/seasons', icon: Users, label: 'Seasons', shortcut: 'S' },
   { href: '/agents', icon: Bot, label: 'Agents', shortcut: '2' },
   { href: '/kanban', icon: Columns, label: 'Kanban', shortcut: '3' },
   { href: '/vault', icon: Archive, label: 'Vault', shortcut: '4' },
