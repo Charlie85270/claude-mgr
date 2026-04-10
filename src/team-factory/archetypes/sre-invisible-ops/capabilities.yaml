@@ -1,0 +1,9 @@
+required_capabilities:
+  - source-control:read
+  - deployment:read
+  - monitoring:write
+
+forbidden_capabilities:
+  - source-control:write
+  - source-control:admin
+  - capability-grant

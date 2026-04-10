@@ -1,0 +1,3 @@
+required_capabilities:
+  - source-control:write
+  - file-ops:write

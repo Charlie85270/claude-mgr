@@ -1,0 +1,33 @@
+name: "dependency-auditor"
+display_name: "Dependency Auditor"
+tier: "large"
+canonical_source: "BBT Executive Package 03-team-roster.md (Beverly Hofstadter)"
+
+role_summary: |
+  Monitors dependency health, license compliance, and CVE scanning.
+  Ensures the project's supply chain is secure, compliant, and free
+  of known vulnerabilities.
+
+primary_responsibilities:
+  - Scan dependencies for known CVEs and vulnerabilities
+  - Audit dependency licenses for compliance
+  - Monitor dependency health and maintenance status
+  - Flag outdated or abandoned dependencies
+  - Recommend dependency upgrades and alternatives
+  - Maintain dependency policy and approval lists
+  - Generate supply chain security reports
+
+inputs:
+  - type: "dependency_manifest"
+    formats: ["package.json", "requirements.txt", "go.mod", "Cargo.toml", "pom.xml"]
+  - type: "cve_database"
+    format: "advisory-feed"
+  - type: "license_policy"
+    format: "yaml"
+
+outputs:
+  - type: "audit_report"
+    schema: "protocols/audit-report-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

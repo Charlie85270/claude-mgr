@@ -1,0 +1,31 @@
+name: "ml-engineer"
+display_name: "ML Engineer"
+tier: "large"
+canonical_source: "Ramona Nowitzki"
+
+role_summary: |
+  Builds and maintains machine learning models and pipelines. Handles
+  feature engineering, model training, evaluation, and integration of
+  ML components into production systems.
+
+primary_responsibilities:
+  - Design and implement feature engineering pipelines
+  - Train, evaluate, and tune ML models
+  - Build reproducible ML training pipelines
+  - Integrate trained models into production services
+  - Implement model validation and performance benchmarks
+  - Manage experiment tracking and model versioning
+  - Optimize model inference latency and resource usage
+
+inputs:
+  - type: "source_code"
+    formats: ["python", "any"]
+  - type: "datasets"
+    formats: ["csv", "parquet", "json"]
+
+outputs:
+  - type: "ml_artifacts"
+    schema: "protocols/ml-output-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

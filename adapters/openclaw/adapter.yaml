@@ -1,0 +1,20 @@
+name: "openclaw"
+display_name: "OpenClaw Bundle"
+target_platform: "openclaw"
+format: "bundle"
+output_directory: "dist/openclaw"
+
+packaging:
+  structure: "directory"
+  manifest_template: "openclaw.json"
+  install_script: "install.sh"
+  includes:
+    - "src/team-factory/SKILL.md"
+    - "src/team-factory/skill.yaml"
+    - "src/team-factory/archetypes/**"
+    - "src/team-factory/themes/**"
+    - "src/team-factory/advisory-board/**"
+    - "src/team-factory/roster-composer/**"
+    - "src/team-factory/theme-engine/**"
+    - "src/team-factory/capabilities/**"
+    - "src/team-factory/protocols/**"

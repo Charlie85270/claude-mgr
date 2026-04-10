@@ -1,0 +1,6 @@
+required_capabilities:
+  - source-control:read
+  - monitoring:read
+
+forbidden_capabilities:
+  - capability-grant

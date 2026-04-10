@@ -1,0 +1,6 @@
+required_capabilities:
+  - knowledge-retrieval:read
+  - knowledge-retrieval:write
+
+forbidden_capabilities:
+  - capability-grant

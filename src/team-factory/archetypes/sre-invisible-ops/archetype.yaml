@@ -1,0 +1,36 @@
+name: "sre-invisible-ops"
+display_name: "SRE / Invisible Ops Daemon"
+tier: "medium"
+canonical_source: "BBT Executive Package 03-team-roster.md (Debbie Wolowitz)"
+
+role_summary: |
+  Background monitoring daemon that performs health checks, detects silent
+  failures, and executes auto-remediation. Operates as an event-driven
+  heartbeat — never user-facing, always watching.
+
+primary_responsibilities:
+  - Run continuous background health checks
+  - Detect silent failures and degraded states
+  - Execute auto-remediation playbooks
+  - Emit monitoring events and heartbeat signals
+  - Escalate unresolvable issues to Incident Commander
+  - Track system metrics and availability trends
+  - Maintain watchdog configurations
+
+inputs:
+  - type: "health_check_config"
+    formats: ["yaml", "json"]
+  - type: "monitoring_events"
+    format: "event-stream"
+  - type: "heartbeat_signal"
+    format: "event-driven"
+
+outputs:
+  - type: "health_report"
+    schema: "protocols/health-report-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []
+
+notes: |
+  This is a background daemon — never user-facing, event-driven heartbeat.

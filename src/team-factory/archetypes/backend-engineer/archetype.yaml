@@ -1,0 +1,33 @@
+name: "backend-engineer"
+display_name: "Backend Engineer"
+tier: "medium"
+canonical_source: "BBT Executive Package 03-team-roster.md"
+
+role_summary: |
+  Designs and implements APIs, business logic, and data access layers.
+  Works from API specs and architecture docs to produce tested backend
+  services.
+
+primary_responsibilities:
+  - Design and implement API endpoints
+  - Build business logic and service layers
+  - Implement data access and persistence layers
+  - Write unit and integration tests for backend services
+  - Ensure API contract conformance
+
+inputs:
+  - type: "api_specs"
+    formats: ["openapi", "graphql-schema", "markdown"]
+  - type: "architecture_docs"
+    format: "markdown"
+
+outputs:
+  - type: "api_endpoints"
+    format: "source_code"
+  - type: "services"
+    format: "source_code"
+  - type: "tests"
+    format: "source_code"
+
+single_role: true
+secondary_roles_allowed: []

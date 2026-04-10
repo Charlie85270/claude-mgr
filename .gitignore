@@ -71,3 +71,4 @@ secrets/
 *.key
 *.log
 logs/
+build/node_modules

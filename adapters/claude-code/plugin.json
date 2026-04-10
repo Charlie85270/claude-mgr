@@ -1,0 +1,12 @@
+{
+  "name": "factor-echelon",
+  "version": "0.0.1",
+  "description": "Themed AI agent development team factory",
+  "author": "Scott Newmann",
+  "license": "MIT",
+  "main": "SKILL.md",
+  "claudeCode": {
+    "minVersion": "2.0.0",
+    "type": "skill"
+  }
+}

@@ -1,0 +1,21 @@
+models:
+  gemini:
+    provider: "google"
+    model: "gemini-2.5-pro-latest"
+    client: "gemini.ts"
+    lineage: "gemini-family"
+  gpt5:
+    provider: "openai"
+    model: "gpt-5-2026-04-01"
+    client: "gpt5.ts"
+    lineage: "gpt-family"
+  opus:
+    provider: "anthropic"
+    model: "claude-opus-4-6"
+    client: "opus.ts"
+    lineage: "claude-family"
+  grok:
+    provider: "xai"
+    model: "grok-3-latest"
+    client: "grok.ts"
+    lineage: "grok-family"

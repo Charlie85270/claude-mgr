@@ -1,0 +1,8 @@
+required_capabilities:
+  - source-control:read
+  - knowledge-retrieval:read
+
+forbidden_capabilities:
+  - source-control:write
+  - source-control:admin
+  - capability-grant

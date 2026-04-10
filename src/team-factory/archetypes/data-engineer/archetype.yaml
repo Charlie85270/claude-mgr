@@ -1,0 +1,31 @@
+name: "data-engineer"
+display_name: "Data Engineer"
+tier: "large"
+canonical_source: "Alfred Hofstadter"
+
+role_summary: |
+  Designs and builds data pipelines, ETL/ELT workflows, and data warehouse
+  schemas. Ensures data is reliably ingested, transformed, and made
+  available for downstream consumers.
+
+primary_responsibilities:
+  - Design and implement data ingestion pipelines
+  - Build ETL/ELT workflows for data transformation
+  - Design and maintain data warehouse schemas
+  - Optimize query performance and data partitioning strategies
+  - Implement data quality checks and validation rules
+  - Manage data catalog and metadata documentation
+  - Monitor pipeline health and handle failure recovery
+
+inputs:
+  - type: "source_code"
+    formats: ["python", "sql", "any"]
+  - type: "data_sources"
+    formats: ["api", "database", "file"]
+
+outputs:
+  - type: "pipeline_artifacts"
+    schema: "protocols/pipeline-output-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

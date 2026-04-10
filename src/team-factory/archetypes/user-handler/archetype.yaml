@@ -1,0 +1,31 @@
+name: "user-handler"
+display_name: "User Handler / Decision Maker / Merge Authority"
+tier: "medium"
+canonical_source: "BBT Executive Package 03-team-roster.md"
+
+role_summary: |
+  Manages the user relationship, delegates work to other archetypes,
+  and serves as the final authority on merge conflicts. The central
+  coordination point between the user and the rest of the team.
+
+primary_responsibilities:
+  - Receive and interpret user messages
+  - Delegate tasks to appropriate team archetypes
+  - Make final decisions on merge conflicts
+  - Approve or reject merge requests
+  - Coordinate handoffs between archetypes
+
+inputs:
+  - type: "season_manifest"
+    source: "ingestion-pm"
+  - type: "user_messages"
+    format: "freeform"
+
+outputs:
+  - type: "delegation_assignments"
+    format: "structured"
+  - type: "merge_approvals"
+    format: "structured"
+
+single_role: true
+secondary_roles_allowed: []

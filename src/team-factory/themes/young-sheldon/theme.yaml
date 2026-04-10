@@ -1,0 +1,29 @@
+name: "young-sheldon"
+version: "0.1.0"
+description: "Young Sheldon — first-class bundled expansion for TBBT"
+hierarchy_model: "flat-peer"
+tags:
+  - "sitcom"
+  - "2010s-2020s"
+  - "coming-of-age"
+  - "east-texas"
+  - "academic"
+  - "family-driven"
+  - "prequel"
+expansion:
+  bundled_themes:
+    - "tbbt"
+characters:
+  - mary-cooper
+  - missy-cooper
+  - meemaw
+  - paige-swanson
+  - hubert-givens
+  - dale-ballard
+  - george-cooper-sr
+  - president-hagemeyer
+  - dr-john-sturgis
+  - dr-grant-linkletter
+  - georgie-cooper
+  - mandy-mcallister
+  - tam-nguyen

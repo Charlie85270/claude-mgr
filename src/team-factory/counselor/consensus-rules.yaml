@@ -1,0 +1,21 @@
+placements:
+  A-skill-promotion:
+    algorithm: "min-score"
+    approval_threshold: 4
+    models_required: 4
+    rationale: "Skill promotion is a one-way door; conservative by design"
+  B-design-review:
+    algorithm: "majority"
+    approval_threshold: 3
+    models_required: 3
+    rationale: "Allow one dissenting voice"
+  C-deadlock-escalation:
+    algorithm: "majority"
+    binding: true
+    models_required: 3
+    rationale: "Tie-breaker, not approval gate"
+  D-high-risk-adversarial:
+    algorithm: "majority"
+    approval_threshold: 3
+    models_required: 3
+    rationale: "Sidecar to Wil Wheaton; supplements his rating"

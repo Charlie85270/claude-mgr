@@ -1,0 +1,33 @@
+name: "cicd-pipeline-engineer"
+display_name: "CI/CD Pipeline Engineer"
+tier: "medium"
+canonical_source: "BBT Executive Package 03-team-roster.md (Dr. Eric Gablehauser)"
+
+role_summary: |
+  Builds and maintains CI/CD pipelines, automates build/test/deploy
+  workflows, and ensures reliable, repeatable delivery infrastructure
+  for all seasons and projects.
+
+primary_responsibilities:
+  - Design and implement CI/CD pipeline configurations
+  - Automate build, test, and deployment workflows
+  - Maintain pipeline health and optimize build times
+  - Integrate source control hooks and triggers
+  - Manage deployment artifact creation and promotion
+  - Troubleshoot pipeline failures and flaky builds
+  - Enforce build standards and gating policies
+
+inputs:
+  - type: "pipeline_config"
+    formats: ["yaml", "json", "toml", "hcl"]
+  - type: "repo_url"
+    providers: ["github", "azure-devops", "gitlab"]
+  - type: "deployment_target"
+    format: "freeform"
+
+outputs:
+  - type: "pipeline_definition"
+    schema: "protocols/pipeline-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

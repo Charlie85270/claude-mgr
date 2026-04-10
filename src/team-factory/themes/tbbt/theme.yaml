@@ -1,0 +1,45 @@
+name: "tbbt"
+version: "0.1.0"
+description: "The Big Bang Theory + Young Sheldon combined cast"
+hierarchy_model: "flat-peer"
+tags:
+  - "sitcom"
+  - "2000s-2010s"
+  - "academic"
+  - "physicist-ensemble"
+  - "friendship-driven"
+  - "caltech-pasadena"
+expansion:
+  bundled_themes:
+    - "young-sheldon"
+characters:
+  - penny
+  - leonard-hofstadter
+  - sheldon-cooper
+  - howard
+  - raj
+  - bernadette
+  - amy
+  - stuart-bloom
+  - bert-kibbler
+  - mrs-davis
+  - alex-jensen
+  - leslie-winkle
+  - barry-kripke
+  - wil-wheaton
+  - dr-eric-gablehauser
+  - debbie-wolowitz
+  - mike-rostenkowski
+  - emily-sweeney
+  - lucy
+  - president-siebert
+  - mrs-latham
+  - beverly-hofstadter
+  - dennis-kim
+  - zack-johnson
+  - josh-wolowitz
+  - ramona-nowitzki
+  - alfred-hofstadter
+  - mike-massimino
+  - neil-degrasse-tyson
+  - priya-koothrappali

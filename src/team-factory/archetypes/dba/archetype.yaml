@@ -1,0 +1,32 @@
+name: "dba"
+display_name: "DBA (Database Administrator)"
+tier: "enterprise"
+canonical_source: "Bert Kibbler (scales up)"
+scales_from: database-engineer
+
+role_summary: |
+  Provides enterprise-depth database administration including replication,
+  sharding, performance tuning, and disaster recovery. Scales up from the
+  database-engineer archetype for workloads that demand DBA-level rigor.
+
+primary_responsibilities:
+  - Configure and manage database replication topologies
+  - Design and implement sharding strategies
+  - Perform deep query performance tuning and index optimization
+  - Build and test disaster recovery and backup procedures
+  - Manage database upgrades, migrations, and patching
+  - Monitor database health, capacity, and SLA compliance
+  - Conduct failover drills and validate recovery objectives
+
+inputs:
+  - type: "source_code"
+    formats: ["sql", "any"]
+  - type: "database_configs"
+    formats: ["yaml", "json", "sql"]
+
+outputs:
+  - type: "database_artifacts"
+    schema: "protocols/database-output-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

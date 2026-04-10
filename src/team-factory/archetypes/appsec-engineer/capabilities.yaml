@@ -1,0 +1,6 @@
+required_capabilities:
+  - source-control:read
+  - file-ops:write
+  - monitoring:read
+
+forbidden_capabilities: []

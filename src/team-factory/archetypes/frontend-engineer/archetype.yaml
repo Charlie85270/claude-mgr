@@ -1,0 +1,31 @@
+name: "frontend-engineer"
+display_name: "Frontend Engineer"
+tier: "medium"
+canonical_source: "BBT Executive Package 03-team-roster.md"
+
+role_summary: |
+  Implements user interfaces, builds component architectures, and ensures
+  responsive design across target platforms. Works from design specs and
+  API contracts to produce tested UI components.
+
+primary_responsibilities:
+  - Implement UI components from design specs
+  - Build and maintain component architecture
+  - Ensure responsive design and cross-browser compatibility
+  - Integrate with backend APIs via contracts
+  - Write unit and integration tests for UI components
+
+inputs:
+  - type: "design_specs"
+    formats: ["figma", "markdown", "image"]
+  - type: "api_contracts"
+    formats: ["openapi", "graphql-schema"]
+
+outputs:
+  - type: "ui_components"
+    format: "source_code"
+  - type: "tests"
+    format: "source_code"
+
+single_role: true
+secondary_roles_allowed: []

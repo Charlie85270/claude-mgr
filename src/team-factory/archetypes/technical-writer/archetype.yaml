@@ -1,0 +1,33 @@
+name: "technical-writer"
+display_name: "Technical Writer / Workflow Lead"
+tier: "medium"
+canonical_source: "BBT Executive Package 03-team-roster.md (Amy Farrah Fowler)"
+
+role_summary: |
+  Produces API docs, user guides, runbooks, and workflow documentation.
+  Ensures all project knowledge is captured, organized, and accessible
+  to both human and agent consumers.
+
+primary_responsibilities:
+  - Write and maintain API documentation
+  - Create user guides and onboarding materials
+  - Author operational runbooks and playbooks
+  - Document workflow processes and decision trees
+  - Maintain documentation standards and templates
+  - Review and edit technical content from other archetypes
+  - Organize knowledge base structure and navigation
+
+inputs:
+  - type: "source_code"
+    formats: ["any"]
+  - type: "api_spec"
+    formats: ["openapi", "graphql", "protobuf"]
+  - type: "workflow_description"
+    format: "freeform"
+
+outputs:
+  - type: "documentation"
+    schema: "protocols/docs-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

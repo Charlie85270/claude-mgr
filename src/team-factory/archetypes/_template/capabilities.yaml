@@ -1,0 +1,5 @@
+required_capabilities:
+  - "TODO:read"
+
+forbidden_capabilities:
+  - "TODO:write"

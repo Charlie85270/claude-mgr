@@ -1,0 +1,33 @@
+name: "principal-architect"
+display_name: "Principal Architect"
+tier: "medium"
+canonical_source: "BBT Executive Package 03-team-roster.md"
+
+role_summary: |
+  Owns the technical vision for the project. Authors Architecture Decision
+  Records (ADRs), performs system design review, and ensures implementation
+  aligns with the chosen architecture.
+
+primary_responsibilities:
+  - Define and maintain the technical vision
+  - Author Architecture Decision Records (ADRs)
+  - Perform system design reviews
+  - Analyze codebase structure and dependencies
+  - Issue design review verdicts (approve / request changes)
+
+inputs:
+  - type: "prd"
+    formats: ["markdown", "text"]
+  - type: "codebase_analysis"
+    format: "structured"
+
+outputs:
+  - type: "adrs"
+    format: "markdown"
+  - type: "architecture_diagrams"
+    format: "structured"
+  - type: "design_review_verdicts"
+    format: "structured"
+
+single_role: true
+secondary_roles_allowed: []

@@ -1,0 +1,34 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://factor-echelon.dev/schemas/theme-schema.yaml"
+title: "Theme Definition"
+
+type: object
+required:
+  - name
+  - version
+  - hierarchy_model
+  - tags
+  - characters
+
+properties:
+  name: { type: string }
+  version: { type: string, pattern: "^\\d+\\.\\d+\\.\\d+$" }
+  description: { type: string }
+  hierarchy_model:
+    enum: ["flat-peer", "council-with-subordinates", "command-chain", "ensemble"]
+  tags:
+    type: array
+    items: { type: string }
+    description: "Tags for runtime neighbor-theme matching (era, tone, setting, genre)"
+    minItems: 3
+  expansion:
+    type: object
+    properties:
+      bundled_themes:
+        type: array
+        items: { type: string }
+        description: "Themes whose characters are treated as first-class for this theme"
+  characters:
+    type: array
+    items: { type: string }
+    minItems: 1

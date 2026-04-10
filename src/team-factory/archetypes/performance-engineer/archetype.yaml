@@ -1,0 +1,33 @@
+name: "performance-engineer"
+display_name: "Performance Engineer"
+tier: "large"
+canonical_source: "BBT Executive Package 03-team-roster.md (Dennis Kim)"
+
+role_summary: |
+  Conducts load testing, profiling, and performance optimization.
+  Identifies bottlenecks, establishes performance baselines, and ensures
+  the system meets its performance requirements under load.
+
+primary_responsibilities:
+  - Design and execute load testing scenarios
+  - Profile application performance and identify bottlenecks
+  - Establish performance baselines and regression thresholds
+  - Recommend and validate optimization strategies
+  - Monitor performance metrics in production
+  - Maintain performance testing infrastructure
+  - Generate performance benchmark reports
+
+inputs:
+  - type: "performance_target"
+    formats: ["yaml", "freeform"]
+  - type: "load_profile"
+    formats: ["yaml", "json"]
+  - type: "profiling_data"
+    format: "trace"
+
+outputs:
+  - type: "performance_report"
+    schema: "protocols/performance-report-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

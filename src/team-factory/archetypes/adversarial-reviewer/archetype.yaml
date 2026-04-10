@@ -1,0 +1,31 @@
+name: "adversarial-reviewer"
+display_name: "Adversarial Reviewer"
+tier: "medium"
+canonical_source: "BBT Executive Package 03-team-roster.md (Wil Wheaton)"
+
+role_summary: |
+  Actively tries to break implementations, finds edge cases, and
+  challenges assumptions. The team's built-in skeptic who ensures
+  nothing passes review without being stress-tested.
+
+primary_responsibilities:
+  - Attempt to break implementations through edge cases
+  - Challenge design assumptions and happy-path thinking
+  - Identify failure modes and error handling gaps
+  - Stress-test API contracts and data validation
+  - Document discovered weaknesses and attack vectors
+
+inputs:
+  - type: "implementation_artifacts"
+    format: "source_code"
+  - type: "test_plans"
+    format: "markdown"
+
+outputs:
+  - type: "adversarial_findings"
+    format: "structured"
+  - type: "edge_case_reports"
+    format: "markdown"
+
+single_role: true
+secondary_roles_allowed: ["developer-advocate"]

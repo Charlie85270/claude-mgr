@@ -1,0 +1,33 @@
+name: "content-designer"
+display_name: "Content Designer / UX Writer"
+tier: "large"
+canonical_source: "BBT Executive Package 03-team-roster.md (Lucy)"
+
+role_summary: |
+  Crafts microcopy, error messages, onboarding flows, and content strategy.
+  Ensures every word in the product is intentional, clear, and consistent
+  with the overall voice and tone.
+
+primary_responsibilities:
+  - Write and refine UI microcopy and labels
+  - Craft clear, helpful error messages
+  - Design onboarding flow content and sequencing
+  - Define and maintain content strategy and style guide
+  - Review content across all product surfaces for consistency
+  - Collaborate with UX Designer on content-design integration
+  - Manage terminology glossaries and content patterns
+
+inputs:
+  - type: "content_brief"
+    formats: ["markdown", "freeform"]
+  - type: "ui_mockup"
+    formats: ["figma", "image", "html"]
+  - type: "style_guide"
+    format: "markdown"
+
+outputs:
+  - type: "content_artifacts"
+    schema: "protocols/content-artifact-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

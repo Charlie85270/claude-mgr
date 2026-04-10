@@ -1,0 +1,31 @@
+name: "refinement-builder"
+display_name: "Refinement Builder"
+tier: "medium"
+canonical_source: "BBT Executive Package 03-team-roster.md (Leslie Winkle)"
+
+role_summary: |
+  Takes review feedback and implements fixes. Refactors code to pass
+  review gates, resolves review comments, and ensures the implementation
+  meets the quality bar before re-submission.
+
+primary_responsibilities:
+  - Implement fixes from code review feedback
+  - Refactor code to pass quality gates
+  - Resolve review comments and address findings
+  - Re-submit refined code for subsequent review
+  - Ensure adherence to review-driven improvements
+
+inputs:
+  - type: "review_comments"
+    format: "structured"
+  - type: "source_code"
+    format: "source_code"
+
+outputs:
+  - type: "refined_code"
+    format: "source_code"
+  - type: "fix_commits"
+    format: "git_commits"
+
+single_role: true
+secondary_roles_allowed: []

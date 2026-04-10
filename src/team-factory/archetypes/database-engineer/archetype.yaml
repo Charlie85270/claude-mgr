@@ -1,0 +1,36 @@
+name: "database-engineer"
+display_name: "Database Engineer"
+tier: "medium"
+canonical_source: "BBT Executive Package 03-team-roster.md (Bert Kibbler)"
+
+role_summary: |
+  Owns schema design, query optimization, and database migrations.
+  Ensures data models are performant, normalized appropriately, and
+  migration paths are safe and reversible.
+
+primary_responsibilities:
+  - Design and maintain database schemas
+  - Optimize queries for performance
+  - Author and review migration scripts
+  - Define indexing strategies
+  - Ensure data integrity constraints
+
+inputs:
+  - type: "data_requirements"
+    format: "structured"
+  - type: "architecture_docs"
+    format: "markdown"
+
+outputs:
+  - type: "schemas"
+    format: "sql"
+  - type: "migrations"
+    format: "sql"
+  - type: "query_optimizations"
+    format: "structured"
+
+single_role: true
+secondary_roles_allowed: []
+
+notes: |
+  Scales to DBA at enterprise tier.

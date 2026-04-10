@@ -1,0 +1,18 @@
+wing: "season-alpha-01"
+hall: "patterns"
+content: "Retry with exponential backoff for flaky API calls. Base delay 1s, max 5 retries, jitter factor 0.5. Wrap in a reusable utility that accepts a function and config object."
+tags:
+  - resilience
+  - api
+  - retry
+  - backend
+metadata:
+  character: "howard"
+  archetype: "platform-engineer"
+  tier: "large"
+  season: "alpha-01"
+  occurrences: 3
+  source_tasks:
+    - "integrate-payment-api"
+    - "sync-inventory-service"
+    - "fetch-shipping-rates"

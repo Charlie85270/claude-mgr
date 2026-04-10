@@ -1,0 +1,33 @@
+name: "accessibility-engineer"
+display_name: "Accessibility Engineer"
+tier: "large"
+canonical_source: "BBT Executive Package 03-team-roster.md (Mary Cooper, shared TBBT/YS)"
+
+role_summary: |
+  Ensures WCAG compliance, conducts screen reader testing, and performs
+  accessibility auditing. Guarantees that all product surfaces are usable
+  by people with disabilities.
+
+primary_responsibilities:
+  - Audit product surfaces for WCAG compliance
+  - Conduct screen reader and assistive technology testing
+  - Review markup and components for a11y best practices
+  - Maintain accessibility standards and checklists
+  - File and track accessibility defects
+  - Collaborate with UX Designer on accessible design patterns
+  - Generate accessibility compliance reports
+
+inputs:
+  - type: "ui_component"
+    formats: ["html", "jsx", "vue", "svelte"]
+  - type: "wcag_criteria"
+    format: "yaml"
+  - type: "audit_request"
+    format: "freeform"
+
+outputs:
+  - type: "a11y_report"
+    schema: "protocols/a11y-report-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

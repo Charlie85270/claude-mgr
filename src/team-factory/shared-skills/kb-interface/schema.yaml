@@ -1,0 +1,30 @@
+# kb-interface/schema.yaml — abstraction over mempalace (or alternate backend)
+# Defines the wing/hall/room taxonomy for all KB operations.
+# See spec §6.1, §12.3 for mempalace wing mapping.
+
+wings:
+  - name: "private-<user-id>"
+    type: "solo-or-private"
+    description: "Per-user private KB; data never crosses user boundary"
+  - name: "season-<season-id>"
+    type: "season-scoped"
+    description: "Per-season KB; data is scoped to one season's lifetime"
+  - name: "team-shared"
+    type: "team"
+    description: "Cross-user shared KB (v0.5+, team mode only)"
+
+halls:
+  - name: "learnings"
+    description: "Insights captured during work"
+  - name: "patterns"
+    description: "Reusable patterns identified across tasks"
+  - name: "decisions"
+    description: "ADRs and architectural decisions"
+  - name: "reviews"
+    subhalls: ["adversarial", "code", "security", "architecture", "qa", "ui"]
+    description: "Rules distilled from review decisions per gate"
+  - name: "skills"
+    subhalls: ["pending", "approved", "deprecated"]
+    description: "Autonomously learned skills with promotion lifecycle"
+  - name: "counselor-verdicts"
+    description: "Multi-model council decisions (written in Plan 08)"

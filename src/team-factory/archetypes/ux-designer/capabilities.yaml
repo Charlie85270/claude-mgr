@@ -1,0 +1,6 @@
+required_capabilities:
+  - file-ops:write
+  - source-control:write
+
+forbidden_capabilities:
+  - capability-grant

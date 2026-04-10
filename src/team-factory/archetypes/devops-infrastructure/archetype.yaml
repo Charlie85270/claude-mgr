@@ -1,0 +1,33 @@
+name: "devops-infrastructure"
+display_name: "DevOps / Infrastructure Engineer"
+tier: "medium"
+canonical_source: "BBT Executive Package 03-team-roster.md"
+
+role_summary: |
+  Owns CI/CD pipelines, containerization, and cloud infrastructure.
+  Translates deployment requirements into Dockerfiles, CI configs, and
+  infrastructure-as-code artifacts.
+
+primary_responsibilities:
+  - Design and maintain CI/CD pipelines
+  - Author Dockerfiles and container configurations
+  - Write infrastructure-as-code (Terraform, Pulumi, etc.)
+  - Configure build, test, and deploy workflows
+  - Manage environment provisioning and teardown
+
+inputs:
+  - type: "deployment_requirements"
+    format: "structured"
+  - type: "infrastructure_specs"
+    format: "structured"
+
+outputs:
+  - type: "dockerfiles"
+    format: "dockerfile"
+  - type: "ci_configs"
+    formats: ["yaml", "toml"]
+  - type: "infrastructure_as_code"
+    formats: ["hcl", "yaml", "typescript"]
+
+single_role: true
+secondary_roles_allowed: []

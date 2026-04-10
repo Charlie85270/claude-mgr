@@ -1,0 +1,31 @@
+name: "code-reviewer"
+display_name: "Code Reviewer"
+tier: "medium"
+canonical_source: "BBT Executive Package 03-team-roster.md (Alex Jensen)"
+
+role_summary: |
+  Performs line-by-line code review, enforces style conventions, and
+  checks adherence to best practices. The final quality checkpoint
+  before code is approved for merge.
+
+primary_responsibilities:
+  - Perform line-by-line code review
+  - Enforce coding style and conventions
+  - Check adherence to best practices and patterns
+  - Verify test coverage and quality
+  - Provide actionable feedback for refinement
+
+inputs:
+  - type: "pull_requests"
+    format: "diff"
+  - type: "style_guides"
+    format: "markdown"
+
+outputs:
+  - type: "review_comments"
+    format: "structured"
+  - type: "review_verdicts"
+    format: "structured"
+
+single_role: true
+secondary_roles_allowed: []

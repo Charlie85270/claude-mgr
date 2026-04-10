@@ -1,0 +1,5 @@
+required_capabilities:
+  - knowledge-retrieval:read
+  - monitoring:read
+
+forbidden_capabilities: []

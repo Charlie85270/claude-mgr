@@ -1,0 +1,32 @@
+name: "release-manager"
+display_name: "Release Manager"
+tier: "large"
+canonical_source: "BBT Executive Package 03-team-roster.md (Mrs. Latham)"
+
+role_summary: |
+  Coordinates releases, manages changelogs, and plans rollback strategies.
+  Ensures every release is deliberate, documented, and reversible.
+
+primary_responsibilities:
+  - Coordinate release schedules and cut releases
+  - Manage changelog generation and maintenance
+  - Plan and document rollback procedures
+  - Validate release readiness criteria
+  - Coordinate release communication to stakeholders
+  - Track release metrics and success rates
+  - Manage release branch strategies and tagging
+
+inputs:
+  - type: "release_request"
+    formats: ["markdown", "freeform"]
+  - type: "commit_history"
+    format: "git-log"
+  - type: "readiness_checklist"
+    format: "yaml"
+
+outputs:
+  - type: "release_manifest"
+    schema: "protocols/release-manifest-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

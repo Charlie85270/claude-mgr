@@ -1,0 +1,10 @@
+required_capabilities:
+  - source-control:read
+  - prd-intake:write
+  - file-ops:write
+  - knowledge-retrieval:read
+
+forbidden_capabilities:
+  - source-control:write
+  - source-control:admin
+  - capability-grant

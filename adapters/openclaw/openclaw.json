@@ -1,0 +1,19 @@
+{
+  "$schema": "./openclaw.schema.json",
+  "name": "factor-echelon",
+  "version": "0.0.1",
+  "persona": "factor-echelon",
+  "agent_dir": "~/.openclaw/workspace/factor-echelon",
+  "workspace": "~/.openclaw/workspace",
+  "model": {
+    "provider": "anthropic",
+    "model": "claude-opus-4-6",
+    "thinking": "high"
+  },
+  "features": {
+    "heartbeat": true,
+    "commitments": true,
+    "mempalace_mcp": true,
+    "counselor": true
+  }
+}

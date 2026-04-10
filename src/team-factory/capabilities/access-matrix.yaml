@@ -1,0 +1,237 @@
+# capabilities/access-matrix.yaml
+# RBAC matrix: archetype → scoped shared-skills
+# Format: <skill>:<scope> where scope is read | write | admin | execute
+
+ingestion-pm:
+  - source-control:read
+  - prd-intake:write
+  - file-ops:write
+  - knowledge-retrieval:read
+
+user-handler:
+  - source-control:read
+  - source-control:write
+  - source-control:admin
+  - inter-agent-protocol:admin
+  - quality-gate:override
+  - knowledge-retrieval:read
+  - knowledge-capture:write
+  - counselor-invocation:execute
+
+scrum-master:
+  - source-control:read
+  - knowledge-retrieval:read
+  - inter-agent-protocol:execute
+
+principal-architect:
+  - source-control:read
+  - source-control:write
+  - knowledge-retrieval:read
+  - knowledge-capture:write
+  - quality-gate:approve
+
+devops-infrastructure:
+  - source-control:read
+  - source-control:write
+  - file-ops:write
+  - deployment:write
+  - monitoring:write
+
+frontend-engineer:
+  - source-control:read
+  - source-control:write
+  - git-worktrees:write
+  - file-ops:write
+
+backend-engineer:
+  - source-control:read
+  - source-control:write
+  - git-worktrees:write
+  - file-ops:write
+
+database-engineer:
+  - source-control:read
+  - source-control:write
+  - git-worktrees:write
+  - file-ops:write
+
+qa-lead:
+  - source-control:read
+  - quality-gate:approve
+  - quality-gate:reject
+
+security-engineer:
+  - source-control:read
+  - quality-gate:approve
+  - quality-gate:reject
+  - quality-gate:escalate
+
+adversarial-reviewer:
+  - source-control:read
+  - quality-gate:rate
+  - knowledge-retrieval:read
+  - counselor-invocation:execute
+
+code-reviewer:
+  - source-control:read
+  - quality-gate:approve
+  - quality-gate:reject
+
+refinement-builder:
+  - source-control:read
+  - source-control:write
+  - quality-gate:approve
+
+cicd-pipeline-engineer:
+  - source-control:read
+  - source-control:write
+  - file-ops:write
+  - deployment:write
+
+technical-writer:
+  - source-control:read
+  - source-control:write
+  - file-ops:write
+  - knowledge-retrieval:read
+
+sre-invisible-ops:
+  - source-control:read
+  - deployment:read
+  - monitoring:write
+
+incident-commander:
+  - delegation:write
+  - monitoring:read
+  - knowledge-retrieval:write
+
+ux-designer:
+  - source-control:write
+  - file-ops:write
+
+ux-researcher:
+  - knowledge-retrieval:read
+  - knowledge-retrieval:write
+
+content-designer:
+  - source-control:write
+  - file-ops:write
+
+product-manager:
+  - knowledge-retrieval:read
+  - knowledge-capture:write
+  - delegation:read
+
+release-manager:
+  - source-control:read
+  - deployment:write
+
+dependency-auditor:
+  - source-control:read
+  - knowledge-retrieval:read
+
+performance-engineer:
+  - source-control:read
+  - monitoring:read
+
+accessibility-engineer:
+  - source-control:read
+  - file-ops:write
+
+localization-engineer:
+  - source-control:write
+  - file-ops:write
+
+privacy-officer:
+  - source-control:read
+  - knowledge-retrieval:read
+
+developer-experience-engineer:
+  - source-control:write
+  - file-ops:write
+  - knowledge-capture:write
+
+mobile-ios-engineer:
+  - source-control:read
+  - source-control:write
+  - git-worktrees:write
+  - file-ops:write
+
+mobile-android-engineer:
+  - source-control:read
+  - source-control:write
+  - git-worktrees:write
+  - file-ops:write
+
+ml-engineer:
+  - source-control:read
+  - source-control:write
+  - file-ops:write
+  - knowledge-retrieval:read
+
+data-engineer:
+  - source-control:read
+  - source-control:write
+  - file-ops:write
+
+test-automation-engineer:
+  - source-control:read
+  - source-control:write
+  - file-ops:write
+
+platform-engineer:
+  - source-control:read
+  - source-control:write
+  - file-ops:write
+  - deployment:write
+
+appsec-engineer:
+  - source-control:read
+  - file-ops:write
+  - monitoring:read
+
+technical-program-manager:
+  - delegation:read
+  - knowledge-retrieval:read
+  - knowledge-capture:write
+
+data-scientist:
+  - knowledge-retrieval:read
+  - knowledge-capture:write
+
+dba:
+  - source-control:read
+  - source-control:write
+  - deployment:write
+  - monitoring:read
+
+developer-advocate:
+  - source-control:read
+  - knowledge-retrieval:read
+  - knowledge-capture:write
+
+solution-architect:
+  - source-control:read
+  - knowledge-retrieval:read
+  - knowledge-capture:write
+
+customer-success-engineer:
+  - knowledge-retrieval:read
+  - monitoring:read
+
+mlops-engineer:
+  - source-control:read
+  - source-control:write
+  - deployment:write
+  - monitoring:write
+
+ai-safety-engineer:
+  - source-control:read
+  - knowledge-retrieval:read
+
+# Advisory board
+_advisory_board:
+  all_smes:
+    - knowledge-retrieval:read
+    - knowledge-capture:write
+  steve-jobs:
+    - counselor-invocation:execute

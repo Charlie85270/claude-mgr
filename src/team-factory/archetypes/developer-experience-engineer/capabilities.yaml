@@ -1,0 +1,6 @@
+required_capabilities:
+  - source-control:write
+  - file-ops:write
+  - knowledge-retrieval:write
+
+forbidden_capabilities: []

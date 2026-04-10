@@ -1,0 +1,14 @@
+{
+  "name": "@factor-echelon/build",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "zod": "^3.23.0",
+    "js-yaml": "^4.1.0",
+    "gray-matter": "^4.0.3"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9"
+  }
+}

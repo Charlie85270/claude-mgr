@@ -1,0 +1,17 @@
+wing: "season-alpha-01"
+hall: "reviews"
+subhall: "security"
+content: "Reject any PR that uses string concatenation for SQL queries. Require parameterized queries or an ORM query builder. Flag raw SQL usage in code review."
+tags:
+  - security
+  - sql-injection
+  - code-review
+  - mandatory
+metadata:
+  character: "amy"
+  archetype: "appsec-engineer"
+  tier: "enterprise"
+  season: "alpha-01"
+  gate: "security"
+  severity: "critical"
+  source_review: "PR-042-user-search"

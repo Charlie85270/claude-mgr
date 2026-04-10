@@ -1,0 +1,6 @@
+required_capabilities:
+  - source-control:write
+  - deployment:write
+  - monitoring:write
+
+forbidden_capabilities: []

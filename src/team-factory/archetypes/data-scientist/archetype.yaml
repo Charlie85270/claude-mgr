@@ -1,0 +1,31 @@
+name: "data-scientist"
+display_name: "Data Scientist"
+tier: "enterprise"
+canonical_source: "Dr. John Sturgis (Young Sheldon)"
+
+role_summary: |
+  Performs statistical analysis, designs experiments, runs A/B tests,
+  and derives actionable insights from data. Bridges the gap between
+  raw data and business decisions.
+
+primary_responsibilities:
+  - Design and analyze A/B tests and experiments
+  - Perform statistical analysis on product and business data
+  - Build exploratory data analysis notebooks and reports
+  - Define and validate success metrics for features
+  - Create data visualizations and insight presentations
+  - Develop statistical models for forecasting and segmentation
+  - Collaborate with product teams to inform data-driven decisions
+
+inputs:
+  - type: "datasets"
+    formats: ["csv", "parquet", "json", "sql"]
+  - type: "experiment_configs"
+    formats: ["yaml", "json"]
+
+outputs:
+  - type: "analysis_report"
+    schema: "protocols/analysis-output-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

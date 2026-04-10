@@ -1,0 +1,85 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://factor-echelon.dev/schemas/echelon-pack-schema.yaml"
+title: "Echelon Season Pack"
+description: >
+  A self-contained season pack that Echelon.app can load to spawn a full
+  themed season. Produced by `bun run skill:build:echelon`.
+
+type: object
+required:
+  - pack_version
+  - theme
+  - tier_default
+  - archetypes
+  - characters
+
+properties:
+  pack_version:
+    type: string
+    pattern: "^\\d+\\.\\d+\\.\\d+$"
+    description: "Semver version of this pack"
+  theme:
+    type: string
+    description: "Theme slug (e.g. tbbt, young-sheldon)"
+  tier_default:
+    enum: ["medium", "large", "enterprise"]
+    description: "Default tier when spawning from this pack"
+  archetypes:
+    type: array
+    items:
+      type: object
+      required: [name, tier]
+      properties:
+        name: { type: string }
+        tier: { enum: ["medium", "large", "enterprise"] }
+        display_name: { type: string }
+    minItems: 1
+  characters:
+    type: array
+    items:
+      type: object
+      required: [name, theme, soul_files]
+      properties:
+        name: { type: string }
+        theme: { type: string }
+        soul_files:
+          type: array
+          items: { type: string }
+          minItems: 4
+          description: "At minimum: SOUL.md, AGENTS.md, HEARTBEAT.md, MEMORY.seed.md"
+    minItems: 1
+  shared_skills:
+    type: array
+    items: { type: string }
+    description: "Names of shared skills included in this pack"
+  review_gates:
+    type: array
+    items: { type: string }
+    description: "Review gate definitions (populated by Plan 05)"
+  counselor:
+    type: object
+    description: "Counselor placement templates (populated by Plan 08)"
+  metadata:
+    type: object
+    properties:
+      built_at: { type: string, format: date-time }
+      source_commit: { type: string }
+      build_target: { const: "echelon" }
+
+# Directory structure produced by the build target:
+#
+# dist/echelon/<theme>/
+# ├── pack.yaml                  # validates against this schema
+# ├── roster.manifest.yaml       # default roster for this theme
+# ├── characters/                # one subdir per character with soul package
+# │   ├── penny/
+# │   │   ├── SOUL.md
+# │   │   ├── AGENTS.md
+# │   │   ├── HEARTBEAT.md
+# │   │   ├── MEMORY.seed.md
+# │   │   └── persona.md
+# │   └── ...
+# ├── archetypes/                # archetype definitions
+# ├── shared-skills/             # skills callable by any character
+# ├── protocols/                 # protocol schemas
+# └── theme/                     # theme.yaml + role-mapping.yaml

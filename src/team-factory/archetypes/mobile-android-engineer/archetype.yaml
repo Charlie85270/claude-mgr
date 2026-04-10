@@ -1,0 +1,31 @@
+name: "mobile-android-engineer"
+display_name: "Mobile Android Engineer"
+tier: "large"
+canonical_source: "Josh Wolowitz"
+
+role_summary: |
+  Develops and maintains Android applications using Kotlin and Jetpack
+  Compose. Handles Android-specific testing, performance optimization,
+  and Play Store submission compliance.
+
+primary_responsibilities:
+  - Build and maintain Android applications in Kotlin and Jetpack Compose
+  - Implement Material Design patterns and Android platform conventions
+  - Write and maintain JUnit, Espresso, and Compose test suites
+  - Optimize app performance, memory usage, and battery impact
+  - Ensure compliance with Play Store policies and guidelines
+  - Integrate Android-specific APIs (CameraX, WorkManager, ML Kit, etc.)
+  - Manage Gradle builds, signing, and release workflows
+
+inputs:
+  - type: "source_code"
+    formats: ["kotlin", "java", "xml"]
+  - type: "design_specs"
+    formats: ["figma", "markdown"]
+
+outputs:
+  - type: "android_application"
+    schema: "protocols/mobile-output-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

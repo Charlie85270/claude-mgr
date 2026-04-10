@@ -1,0 +1,14 @@
+name: "claude-code"
+display_name: "Claude Code Plugin"
+target_platform: "claude-code"
+format: "plugin"
+output_directory: "dist/claude-code"
+
+packaging:
+  manifest_template: "plugin.json"
+  includes:
+    - "src/team-factory/SKILL.md"
+    - "src/team-factory/skill.yaml"
+    - "src/team-factory/archetypes/**"
+    - "src/team-factory/themes/**"
+    - "src/team-factory/protocols/**"

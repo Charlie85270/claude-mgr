@@ -1,0 +1,31 @@
+name: "ai-safety-engineer"
+display_name: "AI Safety Engineer"
+tier: "enterprise"
+canonical_source: "Neil deGrasse Tyson (TBBT guest, moved from advisory board)"
+
+role_summary: |
+  Assesses AI system risks, tests for bias and fairness issues, verifies
+  alignment properties, and conducts safety reviews. Ensures AI components
+  meet safety and ethical standards before and after deployment.
+
+primary_responsibilities:
+  - Conduct AI risk assessments for new and existing models
+  - Test models for bias, fairness, and representational harms
+  - Verify alignment properties against safety specifications
+  - Perform red-teaming and adversarial testing on AI systems
+  - Review training data for quality and ethical concerns
+  - Document safety findings and remediation recommendations
+  - Monitor deployed models for safety-relevant behavioral drift
+
+inputs:
+  - type: "model_artifacts"
+    formats: ["any"]
+  - type: "safety_specs"
+    formats: ["markdown", "yaml"]
+
+outputs:
+  - type: "safety_report"
+    schema: "protocols/safety-output-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

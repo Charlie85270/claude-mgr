@@ -1,0 +1,33 @@
+name: "ux-designer"
+display_name: "UX Designer"
+tier: "large"
+canonical_source: "BBT Executive Package 03-team-roster.md (Emily Sweeney)"
+
+role_summary: |
+  Handles visual design, interaction design, and design system management.
+  Produces design artifacts that guide implementation and ensure consistent
+  user experiences across all surfaces.
+
+primary_responsibilities:
+  - Create visual design mockups and prototypes
+  - Define interaction patterns and user flows
+  - Build and maintain the design system
+  - Produce design tokens and component specifications
+  - Collaborate with UX Researcher on research-informed design
+  - Review implemented UI against design specifications
+  - Maintain design asset libraries and style guides
+
+inputs:
+  - type: "design_brief"
+    formats: ["markdown", "freeform"]
+  - type: "research_findings"
+    formats: ["markdown", "json"]
+  - type: "component_request"
+    format: "freeform"
+
+outputs:
+  - type: "design_artifacts"
+    schema: "protocols/design-artifact-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

@@ -1,0 +1,14 @@
+wing: "season-alpha-01"
+hall: "learnings"
+content: "Always validate input before database insert to prevent SQL injection. Parameterized queries are safer than string interpolation."
+tags:
+  - security
+  - database
+  - backend
+  - sql
+metadata:
+  character: "sheldon-cooper"
+  archetype: "backend-engineer"
+  tier: "large"
+  season: "alpha-01"
+  source_task: "implement-user-registration"

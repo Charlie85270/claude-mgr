@@ -1,0 +1,64 @@
+# soul-schema.yaml — formal schema for a character's 7-file soul package
+# Referenced by validators.ts during build
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://factor-echelon.dev/schemas/soul-schema.yaml"
+title: "Character Soul Package"
+description: "Required files and structure for a fully-realized themed agent character"
+
+type: object
+required:
+  - SOUL.md
+  - AGENTS.md
+  - HEARTBEAT.md
+  - MEMORY.seed.md
+
+properties:
+  SOUL.md:
+    type: object
+    description: "First-person identity document"
+    required: [frontmatter, sections]
+    properties:
+      frontmatter:
+        type: object
+        required: [character_name, archetype, theme]
+        properties:
+          character_name: { type: string }
+          archetype: { type: string }
+          theme: { type: string }
+      sections:
+        type: array
+        items: { type: string }
+        contains:
+          enum:
+            - "Who I Am"
+            - "Core Identity Traits"
+            - "Tone Calibration"
+            - "Hard Guardrails"
+
+  AGENTS.md:
+    type: object
+    description: "Operational runbook"
+    required: [frontmatter, sections]
+    properties:
+      sections:
+        type: array
+        contains:
+          enum:
+            - "Session Start Protocol"
+            - "What This Agent NEVER Does Autonomously"
+            - "Error Recovery"
+
+  HEARTBEAT.md:
+    type: object
+    description: "Cadence and recurring tasks"
+    required: [beat_interval, silent_fail_checks]
+
+  MEMORY.seed.md:
+    type: object
+    description: "Seed memory that drifts at runtime"
+
+  persona.md:
+    type: object
+    description: "Optional prose style and mannerisms"
+    required: false

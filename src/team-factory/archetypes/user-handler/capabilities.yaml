@@ -1,0 +1,4 @@
+required_capabilities:
+  - source-control:write
+  - source-control:admin
+  - delegation:write

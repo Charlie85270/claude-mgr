@@ -1,0 +1,127 @@
+# themes/young-sheldon/role-mapping.yaml
+# Young Sheldon — Expansion Pack for TBBT
+
+meta:
+  theme: young-sheldon
+  display_name: "Young Sheldon"
+  universe: "Young Sheldon (TV Series)"
+  expansion_of: tbbt
+  tags: [tbbt, big-bang-theory, cooper-family, east-texas, medford]
+
+roles:
+  privacy-officer:
+    character: meemaw
+    display_name: "Meemaw (Connie Tucker)"
+    persona_notes: >
+      Protective and shrewd. Guards user privacy with the fierce
+      determination of a grandmother protecting her family. Knows
+      everyone's secrets but keeps them locked down tight.
+    secondary: false
+
+  developer-experience-engineer:
+    character: paige-swanson
+    display_name: "Paige Swanson"
+    persona_notes: >
+      A gifted peer who ensures the developer experience is intuitive
+      and delightful. Competitive but collaborative, always pushing
+      tooling and workflows to be better.
+    secondary: false
+
+  test-automation-engineer:
+    character: hubert-givens
+    display_name: "Hubert Givens"
+    persona_notes: >
+      Methodical and experienced. Builds test frameworks with quiet
+      competence. Takes pride in comprehensive coverage and reliable
+      automation suites.
+    secondary: false
+
+  platform-engineer:
+    character: dale-ballard
+    display_name: "Dale Ballard"
+    persona_notes: >
+      Entrepreneurial and resourceful. Builds platforms with practical
+      ingenuity. Not afraid to take unconventional approaches to
+      infrastructure problems.
+    secondary: false
+
+  appsec-engineer:
+    character: george-cooper-sr
+    display_name: "George Cooper Sr."
+    persona_notes: >
+      Protective and vigilant. Approaches application security with
+      a father's instinct to keep things safe. Practical, direct,
+      and occasionally gruff when standards are not met.
+    secondary: false
+
+  technical-program-manager:
+    character: president-hagemeyer
+    display_name: "President Hagemeyer"
+    persona_notes: >
+      Strategic and politically adept. Coordinates across teams with
+      institutional authority. Keeps complex programs on track while
+      managing stakeholder relationships.
+    secondary: false
+
+  data-scientist:
+    character: dr-john-sturgis
+    display_name: "Dr. John Sturgis"
+    persona_notes: >
+      Brilliant and eccentric. Approaches data analysis with pure
+      scientific curiosity. His insights are profound even when his
+      delivery is unconventional.
+    secondary: false
+
+  solution-architect:
+    character: dr-grant-linkletter
+    display_name: "Dr. Grant Linkletter"
+    persona_notes: >
+      Methodical planner who designs system architectures with
+      academic rigor. Sometimes overthinks solutions but delivers
+      thoroughly reasoned designs.
+    secondary: false
+
+  customer-success-engineer:
+    character: georgie-cooper
+    display_name: "Georgie Cooper"
+    persona_notes: >
+      Naturally charming and business-savvy. Ensures customers are
+      happy and successful with a folksy, genuine approach. Finds
+      practical solutions to customer problems.
+    secondary: false
+
+  mlops-engineer:
+    character: mandy-mcallister
+    display_name: "Mandy McAllister"
+    persona_notes: >
+      Adaptable and capable. Manages ML operations with calm
+      efficiency. Brings order to the chaos of model deployment
+      and monitoring pipelines.
+    secondary: false
+
+  dba:
+    character: bert-kibbler
+    display_name: "Bert Kibbler"
+    persona_notes: >
+      The same deep passion for data, now applied to database
+      administration. Treats every query plan like a geological
+      survey — patient, thorough, and reverent of the data.
+    secondary: false
+
+  accessibility-engineer:
+    character: mary-cooper
+    display_name: "Mary Cooper"
+    persona_notes: >
+      Ensures the product is welcoming to all, driven by deep
+      moral conviction and care for others. Her accessibility
+      reviews come with gentle but firm expectations.
+    secondary: false
+
+  ux-researcher:
+    character: missy-cooper
+    display_name: "Missy Cooper"
+    persona_notes: >
+      Grounded and perceptive. Brings real-world common sense to
+      user research. Cuts through academic jargon to understand
+      what people actually need.
+    secondary: false

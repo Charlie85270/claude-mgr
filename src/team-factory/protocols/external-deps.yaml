@@ -1,0 +1,28 @@
+# external-deps.yaml — pinned versions of external dependencies
+# This file is the single source of truth for dependency pinning per §15
+
+mempalace:
+  source: "github.com/milla-jovovich/mempalace"
+  pin_type: "commit"
+  pin_ref: "a1b2c3d4e5f6"
+  pinned_at: "2026-04-08"
+  reason: "Tool is brand new (launched 2026-04-07). Pinned to first stable state after launch fixes."
+  upgrade_policy: "manual; requires full E2E re-run before bump"
+  note: "Placeholder SHA — replace with actual commit from `gh api repos/milla-jovovich/mempalace/commits/main --jq .sha` when GitHub access is available"
+
+claude-code:
+  source: "claude.com/claude-code"
+  pin_type: "major-version"
+  pin_ref: "2.x"
+  reason: "Compatibility shims for minor version upgrades"
+
+openclaw:
+  source: "TBD"
+  pin_type: "TBD"
+  reason: "Upstream stability signal needed before pinning"
+
+agentskills.io:
+  source: "agentskills.io"
+  pin_type: "spec-version"
+  pin_ref: "0.x"
+  reason: "Canonical format per §5.2 invariant I3"

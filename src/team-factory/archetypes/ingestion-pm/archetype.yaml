@@ -1,0 +1,33 @@
+name: "ingestion-pm"
+display_name: "Ingestion PM / Season Producer"
+tier: "medium"
+canonical_source: "BBT Executive Package 03-team-roster.md (Penny Hofstadter)"
+
+role_summary: |
+  Reads PRDs, inspects repos, estimates scope and cost, spawns isolated
+  per-season teams, establishes communication channels, and produces the
+  initial season manifest for handoff to the User Handler archetype.
+
+primary_responsibilities:
+  - Parse incoming PRDs from any supported format
+  - Inspect linked repositories via source-control shared skill (scoped read)
+  - Estimate project scope (task count, rough effort, tier assignment)
+  - Recommend initial roster based on PRD needs and chosen theme
+  - Create communication channels for the new season
+  - Write season.yaml and manifest.yaml handoff artifacts
+  - Hand off to User Handler archetype for ongoing operation
+
+inputs:
+  - type: "prd"
+    formats: ["markdown", "text", "docx", "github-issue", "linear-ticket"]
+  - type: "repo_url"
+    providers: ["github", "azure-devops", "gitlab"]
+  - type: "user_description"
+    format: "freeform"
+
+outputs:
+  - type: "season_manifest"
+    schema: "protocols/roster-manifest-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

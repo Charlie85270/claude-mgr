@@ -1,0 +1,16 @@
+name: "factor-echelon"
+version: "0.0.1"
+description: "Themed AI agent software development team factory"
+author: "Scott Newmann"
+license: "MIT"
+
+compatibility:
+  claude_code: ">=2.0.0"
+  openclaw: "TBD"
+  hermes: "agentskills.io >=0.x"
+
+default_theme: "tbbt"
+available_themes:
+  - "tbbt"
+  - "young-sheldon"  # bundled expansion
+  - "star-wars"      # stub in v0.1

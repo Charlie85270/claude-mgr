@@ -1,0 +1,32 @@
+name: "developer-advocate"
+display_name: "Developer Advocate / DevRel"
+tier: "enterprise"
+canonical_source: "Wil Wheaton secondary role — DevRel is his second archetype alongside Adversarial Reviewer"
+canonical_secondary_of: adversarial-reviewer
+
+role_summary: |
+  Drives external developer relations through documentation, tutorials,
+  community engagement, and developer outreach. Bridges the gap between
+  the product engineering team and the external developer community.
+
+primary_responsibilities:
+  - Create and maintain developer documentation and guides
+  - Write tutorials, code samples, and quickstart materials
+  - Engage with the developer community through forums and events
+  - Gather developer feedback and relay it to product teams
+  - Review API surfaces from an external developer perspective
+  - Produce demo applications and reference implementations
+  - Track developer adoption metrics and sentiment
+
+inputs:
+  - type: "source_code"
+    formats: ["any"]
+  - type: "api_specs"
+    formats: ["openapi", "graphql", "markdown"]
+
+outputs:
+  - type: "devrel_artifacts"
+    schema: "protocols/devrel-output-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

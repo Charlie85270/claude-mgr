@@ -1,0 +1,38 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://factor-echelon.dev/schemas/roster-manifest-schema.yaml"
+title: "Season Roster Manifest"
+description: "Penny's handoff artifact to Leonard at season spawn"
+
+type: object
+required:
+  - season_id
+  - season_slug
+  - theme
+  - tier
+  - roster
+  - channels
+  - user_context
+
+properties:
+  season_id: { type: string, pattern: "^season-\\d{2,}-" }
+  season_slug: { type: string }
+  theme: { type: string }
+  tier: { enum: ["medium", "large", "enterprise"] }
+  roster:
+    type: array
+    items:
+      type: object
+      required: [archetype, character, capabilities]
+      properties:
+        archetype: { type: string }
+        character: { type: string }
+        capabilities: { type: array, items: { type: string } }
+  channels:
+    type: object
+    properties:
+      primary: { type: string }
+      review_gates: { type: string }
+      escalation: { type: string }
+  user_context:
+    type: object
+    required: [user_id, interview_summary]

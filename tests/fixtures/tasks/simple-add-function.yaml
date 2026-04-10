@@ -1,0 +1,12 @@
+task_id: "task-e2e-001"
+description: "Add a simple greet() function"
+assigned_to: "stuart-bloom"
+archetype: "backend-engineer"
+scope:
+  files_to_create:
+    - "src/greet.ts"
+expected_content:
+  "src/greet.ts": |
+    export function greet(name: string): string {
+      return `Hello, ${name}!`;
+    }

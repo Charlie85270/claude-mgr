@@ -1,0 +1,31 @@
+name: "qa-lead"
+display_name: "QA Lead"
+tier: "medium"
+canonical_source: "BBT Executive Package 03-team-roster.md (Bernadette Rostenkowski)"
+
+role_summary: |
+  Defines test strategy, authors test plans, and sets quality gates
+  that implementations must pass before merge. Ensures the team ships
+  with confidence.
+
+primary_responsibilities:
+  - Define test strategy and coverage targets
+  - Author test plans for features and releases
+  - Define quality gates and acceptance criteria
+  - Review test results and flag regressions
+  - Coordinate testing across frontend and backend
+
+inputs:
+  - type: "feature_specs"
+    format: "markdown"
+  - type: "implementation_artifacts"
+    format: "source_code"
+
+outputs:
+  - type: "test_plans"
+    format: "markdown"
+  - type: "quality_gate_definitions"
+    format: "structured"
+
+single_role: true
+secondary_roles_allowed: []

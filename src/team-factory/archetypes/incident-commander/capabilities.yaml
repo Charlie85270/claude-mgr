@@ -1,0 +1,7 @@
+required_capabilities:
+  - delegation:write
+  - monitoring:read
+  - knowledge-retrieval:write
+
+forbidden_capabilities:
+  - capability-grant

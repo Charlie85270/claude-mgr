@@ -1,0 +1,33 @@
+name: "incident-commander"
+display_name: "Incident Commander"
+tier: "medium"
+canonical_source: "BBT Executive Package 03-team-roster.md (Mike Rostenkowski)"
+
+role_summary: |
+  Coordinates incident response, manages escalation paths, and writes
+  post-mortems. Acts as the single point of authority during active
+  incidents, ensuring clear communication and resolution.
+
+primary_responsibilities:
+  - Declare and classify incidents by severity
+  - Coordinate response across involved archetypes
+  - Manage escalation paths and communication channels
+  - Delegate investigation and remediation tasks
+  - Track incident timeline and actions taken
+  - Write post-mortem documents after resolution
+  - Maintain and improve incident response playbooks
+
+inputs:
+  - type: "incident_alert"
+    formats: ["event", "monitoring-alert", "manual-report"]
+  - type: "monitoring_data"
+    format: "event-stream"
+  - type: "escalation_request"
+    format: "freeform"
+
+outputs:
+  - type: "post_mortem"
+    schema: "protocols/post-mortem-schema.yaml"
+
+single_role: true
+secondary_roles_allowed: []

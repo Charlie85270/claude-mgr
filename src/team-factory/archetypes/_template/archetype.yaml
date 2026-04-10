@@ -1,0 +1,21 @@
+name: "TODO-slug"
+display_name: "TODO Display Name"
+tier: "TODO-tier"
+canonical_source: "TODO canonical source reference"
+
+role_summary: |
+  TODO: Describe the archetype's primary purpose and function.
+
+primary_responsibilities:
+  - "TODO: List primary responsibilities"
+
+inputs:
+  - type: "TODO"
+    formats: ["TODO"]
+
+outputs:
+  - type: "TODO"
+    schema: "TODO"
+
+single_role: TODO
+secondary_roles_allowed: []

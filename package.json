@@ -3,6 +3,7 @@
   "version": "1.2.7",
   "private": true,
   "workspaces": [
+    "build",
     "mcp-*"
   ],
   "main": "electron/dist/main.js",
@@ -15,11 +16,11 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "skill:build": "bun run build/build.ts",
-    "skill:build:claude-code": "bun run build/build.ts --target=claude-code",
-    "skill:build:openclaw": "bun run build/build.ts --target=openclaw",
-    "skill:build:echelon": "bun run build/build.ts --target=echelon",
-    "skill:test": "bun test __tests__/team-factory",
+    "skill:build": "cd build && bun run build.ts",
+    "skill:build:claude-code": "cd build && bun run build.ts --target=claude-code",
+    "skill:build:openclaw": "cd build && bun run build.ts --target=openclaw",
+    "skill:build:echelon": "cd build && bun run build.ts --target=echelon",
+    "skill:test": "bun test tests/",
     "echelon:dev": "concurrently \"next dev\" \"npm run electron:start\"",
     "echelon:build": "npm run electron:build",
     "electron:dev": "concurrently \"npm run dev\" \"npm run electron:start\"",
@@ -174,6 +175,8 @@
     "zustand": "^5.0.10"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "bun-types": "^1.1.0",
     "@electron/notarize": "^3.1.1",
     "@electron/rebuild": "^4.0.2",
     "@tailwindcss/postcss": "^4",
