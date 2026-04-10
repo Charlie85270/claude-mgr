@@ -14,5 +14,5 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
-| #5336 | 11:26 AM | 🔵 | Dorothy Agent System Type Definitions | ~401 |
+| #5336 | 11:26 AM | 🔵 | Echelon Agent System Type Definitions | ~401 |
 </claude-mem-context>

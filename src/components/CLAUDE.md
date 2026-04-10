@@ -14,5 +14,5 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
-| #4142 | 4:57 PM | 🔵 | Dorothy Client Layout Structure and Global State Management | ~219 |
+| #4142 | 4:57 PM | 🔵 | Echelon Client Layout Structure and Global State Management | ~219 |
 </claude-mem-context>

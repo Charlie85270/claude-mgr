@@ -7,5 +7,5 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
-| #5337 | 11:26 AM | 🔵 | Dorothy Agent Manager Architecture Review | ~460 |
+| #5337 | 11:26 AM | 🔵 | Echelon Agent Manager Architecture Review | ~460 |
 </claude-mem-context>

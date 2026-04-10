@@ -7,12 +7,12 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
-| #3647 | 8:14 AM | 🔵 | Dorothy Warm Retro Light Theme with CSS Variables System | ~453 |
+| #3647 | 8:14 AM | 🔵 | Echelon Command Center Theme with CSS Variables System | ~453 |
 | #3646 | " | 🔵 | Root Layout Structure with ClientLayout Wrapper | ~293 |
 
 ### Feb 16, 2026
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
-| #4167 | 5:04 PM | 🔵 | Dorothy Root Layout with PWA Configuration | ~482 |
+| #4167 | 5:04 PM | 🔵 | Echelon Root Layout with PWA Configuration | ~482 |
 </claude-mem-context>

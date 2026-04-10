@@ -1,4 +1,4 @@
-/* Google Fonts - DM Serif Display for retro headings */
+/* Google Fonts - DM Serif Display for branding */
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap');
 
 @import "tailwindcss";
@@ -50,195 +50,195 @@
 }
 
 /* ============================================
-   DOROTHY — WARM RETRO LIGHT THEME
+   ECHELON — COMMAND CENTER LIGHT THEME
    ============================================
 
    Philosophy:
-   - Warm cream/beige surfaces (1960s print aesthetic)
-   - Vibrant teal & copper accent palette
-   - Dark brown text for contrast
-   - Generous rounded corners for retro charm
-   - Matches the Dorothy landing page design
+   - Slate surfaces for professional operations-room feel
+   - Deep navy brand color with amber action accents
+   - Green for healthy/active states, amber for in-review
+   - No pure black — warm slate tones throughout
+   - Geist fonts reinforce the command-center aesthetic
 
    ============================================ */
 
 :root {
-  /* Surfaces - Warm cream/beige */
-  --background: #F0E8D5;
-  --foreground: #2C2418;
-  --card: #FAF4EA;
-  --card-foreground: #2C2418;
-  --popover: #FAF4EA;
-  --popover-foreground: #2C2418;
+  /* Surfaces - Clean slate */
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
 
-  /* Primary - Vibrant Teal (from the swirls) */
-  --primary: #3D9B94;
-  --primary-foreground: #FAF4EA;
+  /* Primary - Deep Navy (Echelon brand) */
+  --primary: #1E3A5F;
+  --primary-foreground: #F8FAFC;
 
-  /* Secondary - Slightly darker cream */
-  --secondary: #E8DEC8;
-  --secondary-foreground: #2C2418;
+  /* Secondary - Light slate */
+  --secondary: #F1F5F9;
+  --secondary-foreground: #0F172A;
 
-  /* Muted - Warm tan */
-  --muted: #E8DEC8;
-  --muted-foreground: #7A6E58;
+  /* Muted - Slate mid-tones */
+  --muted: #E2E8F0;
+  --muted-foreground: #64748B;
 
-  /* Accent - Copper/Orange (Dorothy's hair) */
-  --accent: #CD7F4A;
-  --accent-foreground: #FAF4EA;
+  /* Accent - Amber (in-review / action) */
+  --accent: #D97706;
+  --accent-foreground: #FFFFFF;
 
-  /* Destructive - Reddish Brown */
-  --destructive: #B85440;
+  /* Destructive - Red */
+  --destructive: #DC2626;
 
   /* Borders & inputs */
-  --border: #D5CAB4;
-  --input: #FAF4EA;
-  --ring: #3D9B94;
+  --border: #E2E8F0;
+  --input: #FFFFFF;
+  --ring: #1E3A5F;
 
   /* Legacy variables for backwards compatibility */
-  --bg-primary: #F0E8D5;
-  --bg-secondary: #FAF4EA;
-  --bg-tertiary: #E8DEC8;
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #F1F5F9;
   --bg-elevated: #FFFFFF;
-  --border-primary: #D5CAB4;
-  --border-accent: #C4B89A;
-  --text-primary: #2C2418;
-  --text-secondary: #7A6E58;
-  --text-muted: #9A8E78;
+  --border-primary: #E2E8F0;
+  --border-accent: #CBD5E1;
+  --text-primary: #0F172A;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
 
-  /* Status colors - Dorothy palette */
-  --success: #4A8B50;
-  --success-muted: rgba(74, 139, 80, 0.12);
-  --warning: #CD7F4A;
-  --warning-muted: rgba(205, 127, 74, 0.12);
-  --danger: #B85440;
-  --danger-muted: rgba(184, 84, 64, 0.12);
-  --info: #3D9B94;
-  --info-muted: rgba(61, 155, 148, 0.12);
+  /* Status colors - Echelon palette */
+  --success: #16A34A;
+  --success-muted: rgba(22, 163, 74, 0.12);
+  --warning: #D97706;
+  --warning-muted: rgba(217, 119, 6, 0.12);
+  --danger: #DC2626;
+  --danger-muted: rgba(220, 38, 38, 0.12);
+  --info: #1E3A5F;
+  --info-muted: rgba(30, 58, 95, 0.12);
 
-  /* Accent colors - Dorothy palette */
-  --accent-blue: #3D9B94;
-  --accent-blue-dim: #348680;
-  --accent-green: #4A8B50;
-  --accent-green-dim: #3D7542;
-  --accent-amber: #CD7F4A;
-  --accent-amber-dim: #B86E3C;
-  --accent-red: #B85440;
-  --accent-red-dim: #9E4536;
-  --accent-purple: #8B6B9B;
-  --accent-purple-dim: #765A85;
-  --accent-cyan: #3D9B94;
-  --accent-cyan-dim: #348680;
+  /* Accent colors - Echelon palette */
+  --accent-blue: #1E3A5F;
+  --accent-blue-dim: #162D4A;
+  --accent-green: #16A34A;
+  --accent-green-dim: #15803D;
+  --accent-amber: #D97706;
+  --accent-amber-dim: #B45309;
+  --accent-red: #DC2626;
+  --accent-red-dim: #B91C1C;
+  --accent-purple: #7C3AED;
+  --accent-purple-dim: #6D28D9;
+  --accent-cyan: #1E3A5F;
+  --accent-cyan-dim: #162D4A;
 
-  /* Charts - Dorothy spectrum */
-  --chart-1: #3D9B94;
-  --chart-2: #CD7F4A;
-  --chart-3: #4A8B50;
-  --chart-4: #B85440;
-  --chart-5: #2C2418;
+  /* Charts - Echelon spectrum */
+  --chart-1: #1E3A5F;
+  --chart-2: #D97706;
+  --chart-3: #16A34A;
+  --chart-4: #DC2626;
+  --chart-5: #0F172A;
 }
 
 /* ============================================
-   DOROTHY — DARK THEME OVERRIDES
+   ECHELON — DARK THEME OVERRIDES
    ============================================ */
 .dark {
-  /* Surfaces - Deep warm grays */
-  --background: #1A1714;
-  --foreground: #E8DEC8;
-  --card: #242019;
-  --card-foreground: #E8DEC8;
-  --popover: #242019;
-  --popover-foreground: #E8DEC8;
+  /* Surfaces - Deep navy-gray */
+  --background: #0C1524;
+  --foreground: #F1F5F9;
+  --card: #162033;
+  --card-foreground: #F1F5F9;
+  --popover: #162033;
+  --popover-foreground: #F1F5F9;
 
-  /* Primary - Teal stays vibrant, slightly brighter for dark bg */
-  --primary: #4DB8B0;
-  --primary-foreground: #1A1714;
+  /* Primary - Bright navy-blue for dark bg */
+  --primary: #3B82F6;
+  --primary-foreground: #0C1524;
 
-  /* Secondary - Darker warm tone */
-  --secondary: #2E2922;
-  --secondary-foreground: #E8DEC8;
+  /* Secondary - Navy-gray */
+  --secondary: #1E293B;
+  --secondary-foreground: #F1F5F9;
 
-  /* Muted - Dark warm tone */
-  --muted: #2E2922;
-  --muted-foreground: #9A8E78;
+  /* Muted - Dark slate */
+  --muted: #1E293B;
+  --muted-foreground: #94A3B8;
 
-  /* Accent - Copper stays warm */
-  --accent: #CD7F4A;
-  --accent-foreground: #1A1714;
+  /* Accent - Amber stays warm */
+  --accent: #F59E0B;
+  --accent-foreground: #0C1524;
 
   /* Destructive - Slightly brighter for dark bg */
-  --destructive: #D4634D;
+  --destructive: #EF4444;
 
   /* Borders & inputs */
-  --border: #3A342B;
-  --input: #2E2922;
-  --ring: #4DB8B0;
+  --border: #334155;
+  --input: #1E293B;
+  --ring: #3B82F6;
 
   /* Legacy variables */
-  --bg-primary: #1A1714;
-  --bg-secondary: #242019;
-  --bg-tertiary: #2E2922;
-  --bg-elevated: #302B23;
-  --border-primary: #3A342B;
-  --border-accent: #4A4237;
-  --text-primary: #E8DEC8;
-  --text-secondary: #9A8E78;
-  --text-muted: #7A6E58;
+  --bg-primary: #0C1524;
+  --bg-secondary: #162033;
+  --bg-tertiary: #1E293B;
+  --bg-elevated: #233044;
+  --border-primary: #334155;
+  --border-accent: #475569;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
 
-  /* Status colors - Same hues, adjusted for dark bg */
-  --success: #5AAF62;
-  --success-muted: rgba(90, 175, 98, 0.15);
-  --warning: #CD7F4A;
-  --warning-muted: rgba(205, 127, 74, 0.15);
-  --danger: #D4634D;
-  --danger-muted: rgba(212, 99, 77, 0.15);
-  --info: #4DB8B0;
-  --info-muted: rgba(77, 184, 176, 0.15);
+  /* Status colors - Adjusted for dark bg */
+  --success: #22C55E;
+  --success-muted: rgba(34, 197, 94, 0.15);
+  --warning: #F59E0B;
+  --warning-muted: rgba(245, 158, 11, 0.15);
+  --danger: #EF4444;
+  --danger-muted: rgba(239, 68, 68, 0.15);
+  --info: #3B82F6;
+  --info-muted: rgba(59, 130, 246, 0.15);
 
   /* Accent colors */
-  --accent-blue: #4DB8B0;
-  --accent-blue-dim: #3D9B94;
-  --accent-green: #5AAF62;
-  --accent-green-dim: #4A8B50;
-  --accent-amber: #CD7F4A;
-  --accent-amber-dim: #B86E3C;
-  --accent-red: #D4634D;
-  --accent-red-dim: #B85440;
-  --accent-purple: #A080B2;
-  --accent-purple-dim: #8B6B9B;
-  --accent-cyan: #4DB8B0;
-  --accent-cyan-dim: #3D9B94;
+  --accent-blue: #3B82F6;
+  --accent-blue-dim: #2563EB;
+  --accent-green: #22C55E;
+  --accent-green-dim: #16A34A;
+  --accent-amber: #F59E0B;
+  --accent-amber-dim: #D97706;
+  --accent-red: #EF4444;
+  --accent-red-dim: #DC2626;
+  --accent-purple: #A78BFA;
+  --accent-purple-dim: #7C3AED;
+  --accent-cyan: #3B82F6;
+  --accent-cyan-dim: #2563EB;
 
-  /* Charts - Same spectrum (already vibrant) */
-  --chart-1: #4DB8B0;
-  --chart-2: #CD7F4A;
-  --chart-3: #5AAF62;
-  --chart-4: #D4634D;
-  --chart-5: #E8DEC8;
+  /* Charts - Echelon spectrum (vibrant for dark bg) */
+  --chart-1: #3B82F6;
+  --chart-2: #F59E0B;
+  --chart-3: #22C55E;
+  --chart-4: #EF4444;
+  --chart-5: #F1F5F9;
 }
 
 /* Dark mode scrollbar overrides */
 .dark * {
-  scrollbar-color: #4A4237 #2E2922;
+  scrollbar-color: #475569 #1E293B;
 }
 .dark *::-webkit-scrollbar-track {
-  background: #2E2922;
+  background: #1E293B;
 }
 .dark *::-webkit-scrollbar-thumb {
-  background: #4A4237;
+  background: #475569;
 }
 .dark *::-webkit-scrollbar-thumb:hover {
-  background: #4DB8B0;
+  background: #3B82F6;
 }
 .dark *::-webkit-scrollbar-corner {
-  background: #2E2922;
+  background: #1E293B;
 }
 .dark .xterm-viewport::-webkit-scrollbar-thumb {
-  background: #4A4237;
+  background: #475569;
 }
 
 @theme inline {
-  /* Radius - Generous retro rounding */
+  /* Radius - Clean operational rounding */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
@@ -287,18 +287,18 @@
   --color-accent-blue: var(--accent-blue);
   --color-accent-blue-dim: var(--accent-blue-dim);
 
-  /* Override Tailwind cyan scale → Dorothy vibrant teal */
-  --color-cyan-50: #f0faf9;
-  --color-cyan-100: #d0eeeb;
-  --color-cyan-200: #a0ddd8;
-  --color-cyan-300: #6dc8c0;
-  --color-cyan-400: #3D9B94;
-  --color-cyan-500: #348680;
-  --color-cyan-600: #2B706B;
-  --color-cyan-700: #235B57;
-  --color-cyan-800: #1C4845;
-  --color-cyan-900: #153634;
-  --color-cyan-950: #0C2120;
+  /* Override Tailwind cyan scale → Echelon navy palette */
+  --color-cyan-50: #f0f5ff;
+  --color-cyan-100: #dbeafe;
+  --color-cyan-200: #bfdbfe;
+  --color-cyan-300: #93c5fd;
+  --color-cyan-400: #60a5fa;
+  --color-cyan-500: #3B82F6;
+  --color-cyan-600: #2563EB;
+  --color-cyan-700: #1E3A5F;
+  --color-cyan-800: #162D4A;
+  --color-cyan-900: #0F2035;
+  --color-cyan-950: #0C1524;
 
   /* Typography */
   --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -360,7 +360,7 @@
 }
 
 /* ============================================
-   DOROTHY SHAPE OVERRIDES
+   ECHELON SHAPE OVERRIDES
    Force rounded corners globally — overrides
    the 174 hardcoded rounded-none classes
    ============================================ */
@@ -392,7 +392,7 @@ input, textarea, select {
    ============================================ */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #C4B89A #E8DEC8;
+  scrollbar-color: #CBD5E1 #F1F5F9;
 }
 
 *::-webkit-scrollbar {
@@ -401,21 +401,21 @@ input, textarea, select {
 }
 
 *::-webkit-scrollbar-track {
-  background: #E8DEC8;
+  background: #F1F5F9;
   border-radius: 5px;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: #C4B89A;
+  background: #CBD5E1;
   border-radius: 5px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: #3D9B94;
+  background: #1E3A5F;
 }
 
 *::-webkit-scrollbar-corner {
-  background: #E8DEC8;
+  background: #F1F5F9;
 }
 
 /* ============================================
@@ -442,17 +442,17 @@ input, textarea, select {
     border: 1px solid var(--border);
   }
   .card-hover:hover {
-    border-color: rgba(61, 155, 148, 0.4);
-    box-shadow: 0 2px 12px rgba(44, 36, 24, 0.08);
+    border-color: rgba(30, 58, 95, 0.4);
+    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.08);
   }
 
   /* Subtle color touches - colored bottom borders */
   .card-accent {
     transition: all 0.3s ease;
-    border-bottom: 1px solid rgba(61, 155, 148, 0.2);
+    border-bottom: 1px solid rgba(30, 58, 95, 0.2);
   }
   .card-accent:hover {
-    border-bottom-color: rgba(61, 155, 148, 0.4);
+    border-bottom-color: rgba(30, 58, 95, 0.4);
   }
 
   .card-success {
@@ -481,7 +481,7 @@ input, textarea, select {
 
   /* Elevated shadow - soft */
   .shadow-elevated {
-    box-shadow: 0 2px 8px rgba(44, 36, 24, 0.08);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
   }
 
   /* Minimal hover effects */
@@ -490,7 +490,7 @@ input, textarea, select {
   }
   .hover-lift:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(44, 36, 24, 0.1);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
   }
 
   .hover-scale {
@@ -548,7 +548,7 @@ input, textarea, select {
   animation: slide-up 0.3s ease-out;
 }
 
-/* Selection styling - teal highlight */
+/* Selection styling - navy highlight */
 ::selection {
   background: var(--primary);
   color: var(--primary-foreground);
@@ -564,7 +564,7 @@ input, textarea, select {
 }
 
 .btn-primary:hover {
-  background: #348680;
+  background: #162D4A;
 }
 
 /* Input styling */
@@ -581,7 +581,7 @@ input, textarea, select {
 input:focus, textarea:focus, select:focus {
   border-color: var(--primary);
   outline: none;
-  box-shadow: 0 0 0 2px rgba(61, 155, 148, 0.25);
+  box-shadow: 0 0 0 2px rgba(30, 58, 95, 0.25);
 }
 
 input::placeholder, textarea::placeholder {
@@ -597,18 +597,18 @@ button, a, input, textarea, select {
    REACT-GRID-LAYOUT OVERRIDES
    ============================================ */
 .react-grid-item.react-grid-placeholder {
-  background: rgba(61, 155, 148, 0.08) !important;
-  border: 1px solid rgba(61, 155, 148, 0.2) !important;
+  background: rgba(30, 58, 95, 0.08) !important;
+  border: 1px solid rgba(30, 58, 95, 0.2) !important;
   border-radius: 14px !important;
   opacity: 1 !important;
 }
 
 .react-grid-item > .react-resizable-handle::after {
-  border-color: rgba(61, 155, 148, 0.3) !important;
+  border-color: rgba(30, 58, 95, 0.3) !important;
 }
 
 .react-grid-item > .react-resizable-handle:hover::after {
-  border-color: rgba(61, 155, 148, 0.6) !important;
+  border-color: rgba(30, 58, 95, 0.6) !important;
 }
 
 .terminal-drag-handle {
@@ -639,5 +639,5 @@ button, a, input, textarea, select {
   width: 6px;
 }
 .xterm-viewport::-webkit-scrollbar-thumb {
-  background: #5A4E42;
+  background: #475569;
 }

@@ -7,6 +7,20 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    id: 11,
+    version: '2.0.0',
+    date: 'Apr 10, 2026',
+    updates: [
+      'Echelon Launch — the Dorothy rebrand is complete',
+      'Seasons: time-boxed development cycles with automatic phase progression',
+      'Characters: persistent agent personas with configurable traits and expertise',
+      'Review Gates: structured approval checkpoints between season phases',
+      'Counselor: AI-powered advisory system for strategic guidance',
+      'Knowledge Base: centralized KB for agents to reference shared context',
+      'Full UI retheme — deep navy, amber accents, and slate command-center palette',
+    ],
+  },
+  {
     id: 10,
     version: '1.2.7',
     date: '2026-03-28',
