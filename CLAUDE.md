@@ -12,10 +12,12 @@ Echelon is an Electron + Next.js desktop app that hosts the **factor-echelon** t
 
 ## Key References
 
+- **Codebase map**: `docs/CODEBASE_MAP.md` — auto-generated architecture map with IPC channel inventory (~145 channels across 28 namespaces), module guide, data flow diagrams, gotchas, navigation guide
 - **Design spec**: `docs/specs/2026-04-08-factor-echelon-design.md`
 - **Implementation plans**: `docs/superpowers/plans/`
 - **Constants**: `electron/constants/index.ts` (DATA_DIR, paths, config)
 - **Entry point**: `electron/main.ts`
+- **IPC contract**: `electron/preload.ts` (single source of truth)
 
 ## Memory
 

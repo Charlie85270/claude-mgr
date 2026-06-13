@@ -27,13 +27,14 @@ export const PiTerminalSection = ({ appSettings, onSaveAppSettings, onUpdateLoca
     setTesting(true);
     setTestResult(null);
     try {
-      const result = await window.electronAPI?.shell?.exec?.({
-        command: `${appSettings.cliPaths?.pi || 'pi'} --version 2>&1 || echo "not found"`,
+      const result = await window.electronAPI?.shell?.cliProbe?.({
+        binary: 'pi',
+        binaryPath: appSettings.cliPaths?.pi,
       });
-      if (result?.success && result.output && !result.output.includes('not found')) {
+      if (result?.success && result.output) {
         setTestResult({ success: true, version: result.output.trim() });
       } else {
-        setTestResult({ success: false, error: result?.output || result?.error || 'Pi CLI not found' });
+        setTestResult({ success: false, error: result?.error || 'Pi CLI not found' });
       }
     } catch (error) {
       setTestResult({ success: false, error: String(error) });

@@ -63,21 +63,51 @@ function isAllowedWebhookUrl(urlString: string): boolean {
     const parsed = new URL(urlString);
     if (parsed.protocol !== 'https:') return false;
 
+    // URL parses bracketed IPv6 into hostname without brackets.
     const hostname = parsed.hostname.toLowerCase();
 
-    // Block localhost variants
-    if (hostname === 'localhost' || hostname === '[::1]') return false;
+    // Block DNS name localhost
+    if (hostname === 'localhost' || hostname === 'localhost.localdomain') return false;
 
-    // Block private/reserved IP ranges
+    // IPv4 private/reserved ranges
     const ipParts = hostname.split('.').map(Number);
     if (ipParts.length === 4 && ipParts.every(p => !isNaN(p))) {
       const [a, b] = ipParts;
-      if (a === 127) return false;          // 127.x.x.x loopback
-      if (a === 10) return false;           // 10.x.x.x private
+      if (a === 127) return false;                      // 127.x.x.x loopback
+      if (a === 10) return false;                       // 10.x.x.x private
       if (a === 172 && b >= 16 && b <= 31) return false; // 172.16-31.x.x private
-      if (a === 192 && b === 168) return false; // 192.168.x.x private
-      if (a === 169 && b === 254) return false; // 169.254.x.x link-local
-      if (a === 0) return false;            // 0.x.x.x
+      if (a === 192 && b === 168) return false;          // 192.168.x.x private
+      if (a === 169 && b === 254) return false;          // 169.254.x.x link-local
+      if (a === 0) return false;                         // 0.x.x.x
+    }
+
+    // IPv6 — URL.hostname returns the unbracketed form and may include
+    // a zone id (e.g. "fe80::1%25en0"). Strip the zone, lowercase, and
+    // normalize leading zeros/short-forms via a couple of quick prefix checks.
+    if (hostname.includes(':')) {
+      const bare = hostname.split('%')[0];
+      // Explicit loopback
+      if (bare === '::1' || bare === '0:0:0:0:0:0:0:1') return false;
+      // Unspecified / any
+      if (bare === '::' || bare === '0:0:0:0:0:0:0:0') return false;
+      // IPv4-mapped IPv6 (::ffff:127.0.0.1, ::ffff:10.0.0.5 etc.) — re-check the v4 tail.
+      const v4MappedMatch = bare.match(/^::ffff:([0-9.]+)$/);
+      if (v4MappedMatch) {
+        const mappedParts = v4MappedMatch[1].split('.').map(Number);
+        if (mappedParts.length === 4 && mappedParts.every(p => !isNaN(p))) {
+          const [a, b] = mappedParts;
+          if (a === 127 || a === 10 || a === 0) return false;
+          if (a === 172 && b >= 16 && b <= 31) return false;
+          if (a === 192 && b === 168) return false;
+          if (a === 169 && b === 254) return false;
+        }
+      }
+      // Link-local fe80::/10 — first 10 bits are 1111 1110 10, so hex prefix fe80–febf.
+      if (/^fe[89ab][0-9a-f]?:/.test(bare)) return false;
+      // Unique local fc00::/7 — covers fc00: and fd00: prefixes.
+      if (/^f[cd][0-9a-f]{0,2}:/.test(bare)) return false;
+      // Multicast ff00::/8
+      if (/^ff[0-9a-f]{2}:/.test(bare)) return false;
     }
 
     return true;

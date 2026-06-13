@@ -14,6 +14,11 @@ import { getProvider } from '../providers';
 import { extractStatusLine } from '../utils/ansi';
 import { scheduleTick } from '../utils/agents-tick';
 
+/**
+ * Authoritative in-memory agent state. When deleting an entry, also call
+ * `releaseAgentTracking(id)` to clear `previousAgentStatus` and any pending
+ * status-change timeout — otherwise aux maps leak across removed agents.
+ */
 export const agents: Map<string, AgentStatus> = new Map();
 
 export let agentsLoaded = false;
@@ -39,6 +44,20 @@ const pendingStatusChanges: Map<string, {
   scheduledAt: number;
   timeoutId: NodeJS.Timeout;
 }> = new Map();
+
+/**
+ * Call this whenever an agent is removed from the `agents` Map. Clears the
+ * auxiliary `previousAgentStatus` and `pendingStatusChanges` maps and clears
+ * any pending status-change timeout so dead-agent entries don't accumulate.
+ */
+export function releaseAgentTracking(id: string) {
+  previousAgentStatus.delete(id);
+  const pending = pendingStatusChanges.get(id);
+  if (pending) {
+    clearTimeout(pending.timeoutId);
+    pendingStatusChanges.delete(id);
+  }
+}
 
 export function handleStatusChangeNotification(
   agent: AgentStatus,

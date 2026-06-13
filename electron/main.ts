@@ -39,6 +39,7 @@ import {
   handleStatusChangeNotification,
   getSuperAgentOutputBuffer,
   clearSuperAgentOutputBuffer,
+  releaseAgentTracking,
 } from './core/agent-manager';
 
 import {
@@ -412,6 +413,7 @@ app.whenReady().then(async () => {
         }
         // Remove agent
         agents.delete(agentId);
+        releaseAgentTracking(agentId);
         saveAgents();
         console.log(`Agent ${agentId} deleted`);
       }

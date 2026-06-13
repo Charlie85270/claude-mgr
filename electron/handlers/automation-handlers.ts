@@ -1,10 +1,18 @@
 import { ipcMain } from 'electron';
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { spawn } from 'child_process';
 import { getProvider } from '../providers';
 import type { AgentProvider } from '../types';
+
+// Validates an automation id as a strict UUIDv4 before constructing
+// filesystem paths. Rejects traversal attempts and non-UUID inputs.
+const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+function isValidAutomationId(id: unknown): id is string {
+  return typeof id === 'string' && UUID_V4_REGEX.test(id);
+}
 
 // ============================================
 // Automation IPC handlers
@@ -100,7 +108,9 @@ function loadRuns(): AutomationRun[] {
 }
 
 function generateId(): string {
-  return Math.random().toString(36).substring(2, 10);
+  // crypto.randomUUID is cryptographically random; unpredictable IDs
+  // prevent pre-staging of malicious automation-<id>.sh scripts.
+  return crypto.randomUUID();
 }
 
 /** Read defaultProvider from app-settings.json, falling back to 'claude' */
@@ -544,6 +554,12 @@ export function registerAutomationHandlers(): void {
       const automation = automations.find(a => a.id === id);
       if (!automation) {
         return { success: false, error: 'Automation not found' };
+      }
+
+      // Validate id format before using it in a filesystem path. Blocks
+      // traversal (`../x`) and any non-UUID value from reaching `path.join`.
+      if (!isValidAutomationId(id)) {
+        return { success: false, error: 'Invalid automation id' };
       }
 
       // Run the script directly

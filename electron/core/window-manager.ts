@@ -1,8 +1,21 @@
 import { BrowserWindow, protocol, app } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as os from 'os';
 import { getAppBasePath } from '../utils';
-import { MIME_TYPES } from '../constants';
+import { MIME_TYPES, DATA_DIR, VAULT_DIR, TELEGRAM_DOWNLOADS_DIR } from '../constants';
+
+const LOCAL_FILE_ALLOWED_ROOTS: readonly string[] = [
+  path.resolve(VAULT_DIR, 'attachments') + path.sep,
+  path.resolve(TELEGRAM_DOWNLOADS_DIR) + path.sep,
+];
+
+function isPathWithinAllowedRoots(resolved: string): boolean {
+  for (const root of LOCAL_FILE_ALLOWED_ROOTS) {
+    if (resolved === root.slice(0, -1) || resolved.startsWith(root)) return true;
+  }
+  return false;
+}
 
 // Global reference to the main window
 let mainWindow: BrowserWindow | null = null;
@@ -30,7 +43,7 @@ export function createWindow() {
     height: 1000,
     minWidth: 1200,
     minHeight: 800,
-    title: 'Dorothy',
+    title: 'Echelon',
     titleBarStyle: 'hiddenInset',
     backgroundColor: '#F0E8D5',
     webPreferences: {
@@ -106,14 +119,27 @@ export function setupProtocolHandler() {
       const url = new URL(request.url);
       const filePath = decodeURIComponent(url.pathname);
 
-      if (filePath && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-        const ext = path.extname(filePath).toLowerCase();
+      if (!filePath) {
+        return new Response('Not Found', { status: 404 });
+      }
+
+      // Resolve and verify the path is within an allowed root.
+      // This blocks path traversal (../..) and arbitrary reads like
+      // local-file:///Users/x/.echelon/app-settings.json or ~/.ssh/id_rsa.
+      const resolved = path.resolve(filePath);
+      if (!isPathWithinAllowedRoots(resolved)) {
+        console.error('local-file:// denied (outside allowed roots):', resolved);
+        return new Response('Forbidden', { status: 403 });
+      }
+
+      if (fs.existsSync(resolved) && fs.statSync(resolved).isFile()) {
+        const ext = path.extname(resolved).toLowerCase();
         const mimeType = MIME_TYPES[ext] || 'application/octet-stream';
-        return new Response(fs.readFileSync(filePath), {
+        return new Response(fs.readFileSync(resolved), {
           headers: { 'Content-Type': mimeType },
         });
       }
-      console.error('local-file:// not found:', filePath);
+      console.error('local-file:// not found:', resolved);
     } catch (err) {
       console.error('local-file:// error:', err, request.url);
     }

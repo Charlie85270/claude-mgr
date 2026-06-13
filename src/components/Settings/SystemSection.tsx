@@ -10,7 +10,7 @@ interface SystemSectionProps {
 export const SystemSection = ({ info, appSettings, onSaveAppSettings }: SystemSectionProps) => {
   const handleOpenConfigFolder = () => {
     if (info?.configPath && window.electronAPI?.shell) {
-      window.electronAPI.shell.exec({ command: `open "${info.configPath}"` });
+      window.electronAPI.shell.openPath({ path: info.configPath });
     }
   };
 

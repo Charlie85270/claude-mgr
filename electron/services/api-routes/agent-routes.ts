@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as pty from 'node-pty';
 import { app } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
-import { agents, saveAgents } from '../../core/agent-manager';
+import { agents, saveAgents, releaseAgentTracking } from '../../core/agent-manager';
 import { ptyProcesses, writeProgrammaticInput } from '../../core/pty-manager';
 import { buildFullPath } from '../../utils/path-builder';
 import { AgentStatus, AgentCharacter } from '../../types';
@@ -337,6 +337,7 @@ export function registerAgentRoutes(app_: RouteApp, ctx: RouteContext): void {
       }
     }
     agents.delete(req.params.id);
+    releaseAgentTracking(req.params.id);
     saveAgents();
     sendJson({ success: true });
   });

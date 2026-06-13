@@ -328,16 +328,13 @@ export function useElectronShell() {
     return window.electronAPI!.shell.openTerminal({ cwd, command });
   }, []);
 
-  const exec = useCallback(async (command: string, cwd?: string) => {
-    if (!isElectron()) {
-      throw new Error('Electron API not available');
-    }
-    return window.electronAPI!.shell.exec({ command, cwd });
-  }, []);
+  // `exec` removed with the shell:exec RCE surface. Callers that need
+  // shell-like operations use the narrow typed channels directly, e.g.
+  // window.electronAPI.shell.openPath, .gitInfo, .listFiles, .readFile,
+  // .grepCode, .openWithApp.
 
   return {
     isElectron: isElectron(),
     openTerminal,
-    exec,
   };
 }

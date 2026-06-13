@@ -102,7 +102,11 @@ const ATTRACTION  = 0.032;
 const DAMPING     = 0.85;
 const ITERATIONS  = 1;
 
-function tickForce(nodes: GraphNode[], edges: GraphEdge[]) {
+// Returns total kinetic energy after the tick so the rAF loop can decide
+// whether the sim has converged and it's safe to pause until the next
+// interaction or data change. Without this, the O(n²) loop runs forever
+// at 60fps even when the layout has fully settled.
+function tickForce(nodes: GraphNode[], edges: GraphEdge[]): number {
   const n = nodes.length;
   const idx = new Map(nodes.map((nd, i) => [nd.id, i]));
 
@@ -140,16 +144,26 @@ function tickForce(nodes: GraphNode[], edges: GraphEdge[]) {
       b.vx -= fx; b.vy -= fy;
     }
 
-    // Integrate
+    // Integrate + accumulate kinetic energy (sum of v²).
+    let energy = 0;
     for (const nd of nodes) {
       if (nd.fixed) continue;
       nd.vx *= DAMPING;
       nd.vy *= DAMPING;
       nd.x += nd.vx;
       nd.y += nd.vy;
+      energy += nd.vx * nd.vx + nd.vy * nd.vy;
     }
+    if (iter === ITERATIONS - 1) return energy;
   }
+  return 0;
 }
+
+// When summed kinetic energy stays below this threshold for a few frames
+// in a row, the simulation is considered converged and the rAF loop is
+// paused. Any user interaction or data reload will kick it back alive.
+const ENERGY_EPSILON = 0.05;
+const IDLE_FRAMES_TO_PAUSE = 30;
 
 // ── Data types ────────────────────────────────────────────────────────────────
 
@@ -520,6 +534,13 @@ export default function AgentKnowledgeGraph() {
   const hoveredRef   = useRef<string | null>(null);
   const dragRef      = useRef<{ nodeId: string | null; panStart: { x: number; y: number } | null }>({ nodeId: null, panStart: null });
   const warmupRef    = useRef(0);
+  // When the sim has converged (kinetic energy ~0 for several frames in a
+  // row), the loop pauses itself. `kickSimulation` restarts it on user
+  // interaction or data changes. Without this, the O(n²) force tick burned
+  // CPU at 60fps indefinitely.
+  const idleFramesRef = useRef(0);
+  const runningRef = useRef(false);
+  const kickSimulationRef = useRef<() => void>(() => {});
   const claudeDataRef    = useRef<ClaudeDataType | null>(null);
   const memoriesRef      = useRef<ProjectMemory[]>([]);
   const instructionsRef  = useRef<InstructionFiles>({});
@@ -547,7 +568,7 @@ export default function AgentKnowledgeGraph() {
         window.electronAPI?.agent.list().catch(() => []) ?? [],
         window.electronAPI?.claude?.getData().catch(() => null) ?? null,
         window.electronAPI?.memory?.listProjects().catch(() => ({ projects: [], error: null })) ?? { projects: [], error: null },
-        window.electronAPI?.shell?.exec({ command: 'cat ~/.claude/mcp.json' }).catch(() => null) ?? null,
+        window.electronAPI?.shell?.readFileAbs({ absolutePath: '~/.claude/mcp.json' }).catch(() => null) ?? null,
       ]);
 
       const typedAgents = agentList as AgentStatus[];
@@ -577,25 +598,16 @@ export default function AgentKnowledgeGraph() {
       // - ~/.claude/CLAUDE.md  (global Claude config)
       // - ~/.dorothy/CLAUDE.md (global Echelon config)
       // - {projectPath}/CLAUDE.md and {projectPath}/.claude/CLAUDE.md per agent
-      const cmds = [
-        `[ -f "$HOME/.claude/CLAUDE.md" ] && echo "$HOME/.claude/CLAUDE.md"`,
-        `[ -f "$HOME/.dorothy/CLAUDE.md" ] && echo "$HOME/.dorothy/CLAUDE.md"`,
-        ...uniqueProjectPaths.flatMap(p => [
-          `[ -f "${p}/CLAUDE.md" ] && echo "${p}/CLAUDE.md"`,
-          `[ -f "${p}/.claude/CLAUDE.md" ] && echo "${p}/.claude/CLAUDE.md"`,
-        ]),
-        // Ensure exit code 0 so shell:exec puts output in .output not .error
-        `true`,
-      ].join('; ');
-      const claudeMdResult = await window.electronAPI?.shell?.exec({ command: cmds }).catch(() => null);
+      // The checkFiles handler expands leading `~/` to os.homedir() in main.
+      const candidatePaths: string[] = [
+        '~/.claude/CLAUDE.md',
+        '~/.dorothy/CLAUDE.md',
+        '~/.echelon/CLAUDE.md',
+        ...uniqueProjectPaths.flatMap(p => [`${p}/CLAUDE.md`, `${p}/.claude/CLAUDE.md`]),
+      ];
+      const claudeMdResult = await window.electronAPI?.shell?.checkFiles({ paths: candidatePaths }).catch(() => null);
       const instrFiles: InstructionFiles = {};
-      // shell:exec via PTY may include \r and ANSI codes — strip them
-      const rawOutput = (claudeMdResult as { output?: string; error?: string } | null)?.output
-        ?? (claudeMdResult as { output?: string; error?: string } | null)?.error
-        ?? '';
-      // eslint-disable-next-line no-control-regex
-      const cleanOutput = rawOutput.replace(/\x1b\[[0-9;]*m/g, '').replace(/\r/g, '');
-      const foundPaths = cleanOutput.split('\n').map(l => l.trim()).filter(l => l.startsWith('/'));
+      const foundPaths = claudeMdResult?.success ? claudeMdResult.existing : [];
       for (const fp of foundPaths) {
         // Global: ~/.claude/ or ~/.dorothy/ files
         const isGlobal = (fp.includes('/.claude/') && !fp.includes('/.claude/projects/'))
@@ -615,11 +627,20 @@ export default function AgentKnowledgeGraph() {
       // ── Load per-project MCP servers (.mcp.json / .claude/mcp.json) ──
       const projectMcpResults = await Promise.all(
         uniqueProjectPaths.map(async p => {
-          const res = await window.electronAPI?.shell?.exec({
-            command: `cat "${p}/.mcp.json" 2>/dev/null || cat "${p}/.claude/mcp.json" 2>/dev/null || true`,
-          }).catch(() => null);
-          const r = res as { output?: string; error?: string } | null;
-          const output = (r?.output ?? r?.error ?? '').replace(/\r/g, '').trim();
+          // Try both locations; readFile with projectRoot=p scopes the read
+          // to inside the project dir, no shell involved.
+          const tryPaths = ['.mcp.json', '.claude/mcp.json'];
+          let output = '';
+          for (const rel of tryPaths) {
+            const res = await window.electronAPI?.shell?.readFile({
+              projectRoot: p,
+              relativePath: rel,
+            }).catch(() => null);
+            if (res?.success && res.output) {
+              output = res.output.replace(/\r/g, '').trim();
+              if (output) break;
+            }
+          }
           if (!output) return null;
           try {
             const parsed = JSON.parse(output);
@@ -664,6 +685,7 @@ export default function AgentKnowledgeGraph() {
       setNodeCount(graph.nodes.length);
       setEdgeCount(graph.edges.length);
       warmupRef.current = 150;
+      kickSimulationRef.current();
     } finally {
       setLoading(false);
     }
@@ -691,6 +713,7 @@ export default function AgentKnowledgeGraph() {
     setNodeCount(graph.nodes.length);
     setEdgeCount(graph.edges.length);
     warmupRef.current = 120;
+    kickSimulationRef.current();
     // Brief delay so the spinner is visible before the new graph renders
     setTimeout(() => setGraphBuilding(false), 300);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -704,16 +727,45 @@ export default function AgentKnowledgeGraph() {
     if (!ctx) return;
 
     const loop = () => {
-      animRef.current = requestAnimationFrame(loop);
       const graph = graphRef.current;
       const t = transformRef.current;
-      tickForce(graph.nodes, graph.edges);
-      if (warmupRef.current > 0) { warmupRef.current--; return; }
-      drawGraph(ctx, graph, hoveredRef.current, t);
+      const energy = tickForce(graph.nodes, graph.edges);
+
+      if (energy < ENERGY_EPSILON) {
+        idleFramesRef.current++;
+      } else {
+        idleFramesRef.current = 0;
+      }
+
+      if (warmupRef.current > 0) {
+        warmupRef.current--;
+      } else {
+        drawGraph(ctx, graph, hoveredRef.current, t);
+      }
+
+      // Pause the loop once the sim has been idle for enough frames.
+      // It'll be resumed by kickSimulation() on interaction or data change.
+      if (idleFramesRef.current >= IDLE_FRAMES_TO_PAUSE) {
+        runningRef.current = false;
+        return;
+      }
+      animRef.current = requestAnimationFrame(loop);
     };
 
+    const kick = () => {
+      idleFramesRef.current = 0;
+      if (runningRef.current) return;
+      runningRef.current = true;
+      animRef.current = requestAnimationFrame(loop);
+    };
+    kickSimulationRef.current = kick;
+
+    runningRef.current = true;
     animRef.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animRef.current);
+    return () => {
+      cancelAnimationFrame(animRef.current);
+      runningRef.current = false;
+    };
   }, [loading]);
 
   // ── Canvas resize (DPR-aware) ──
@@ -763,12 +815,14 @@ export default function AgentKnowledgeGraph() {
       const t = transformRef.current;
       const nd = graphRef.current.nodes.find(n => n.id === dragRef.current.nodeId);
       if (nd) { nd.x = (ex - t.x) / t.scale; nd.y = (ey - t.y) / t.scale; nd.vx = 0; nd.vy = 0; }
+      kickSimulationRef.current();
       return;
     }
     if (dragRef.current.panStart) {
       const { x: sx, y: sy } = dragRef.current.panStart;
       transformRef.current = { ...transformRef.current, x: transformRef.current.x + (ex - sx), y: transformRef.current.y + (ey - sy) };
       dragRef.current.panStart = { x: ex, y: ey };
+      kickSimulationRef.current();
       return;
     }
 
@@ -776,7 +830,10 @@ export default function AgentKnowledgeGraph() {
     const prev = hoveredRef.current;
     hoveredRef.current = hit?.id ?? null;
     if (canvasRef.current) canvasRef.current.style.cursor = hit ? 'pointer' : 'grab';
-    if (prev !== hoveredRef.current) warmupRef.current = 0;
+    if (prev !== hoveredRef.current) {
+      warmupRef.current = 0;
+      kickSimulationRef.current();
+    }
   }, [hitTest]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -824,15 +881,21 @@ export default function AgentKnowledgeGraph() {
         const res = await window.electronAPI?.memory?.readFile(node.meta.filePath);
         content = res?.content ?? '';
       } else if (node.kind === 'instructions' && node.meta?.filePath) {
-        const fp = node.meta.filePath.replace(/^~/, '');
-        const res = await window.electronAPI?.shell?.exec({ command: `cat "${fp}" 2>/dev/null || cat "$HOME${fp}" 2>/dev/null` });
-        content = (res as { output?: string } | null)?.output ?? '';
+        // filePath may start with `~` or be an absolute path under $HOME.
+        const fp = node.meta.filePath;
+        const res = await window.electronAPI?.shell?.readFileAbs({ absolutePath: fp });
+        content = res?.output ?? '';
       } else if (node.kind === 'skill' && node.meta?.skillPath) {
         const p = node.meta.skillPath;
-        const res = await window.electronAPI?.shell?.exec({
-          command: `cat "${p}/AGENTS.md" 2>/dev/null || cat "${p}/SKILL.md" 2>/dev/null || cat "${p}/skills/SKILL.md" 2>/dev/null || cat "${p}/README.md" 2>/dev/null || find "${p}" -maxdepth 2 -name "*.md" 2>/dev/null | head -1 | xargs cat 2>/dev/null || echo "_No documentation found._"`,
+        const res = await window.electronAPI?.shell?.readAny({
+          paths: [
+            `${p}/AGENTS.md`,
+            `${p}/SKILL.md`,
+            `${p}/skills/SKILL.md`,
+            `${p}/README.md`,
+          ],
         });
-        content = (res as { output?: string } | null)?.output ?? '';
+        content = res?.output || '_No documentation found._';
         setPanelTab('preview');
       } else if (node.kind === 'plugin') {
         content = node.meta?.description
@@ -858,9 +921,12 @@ export default function AgentKnowledgeGraph() {
     if (panelNode.kind === 'memory') {
       await window.electronAPI?.memory?.writeFile(fp, panelDraft);
     } else {
-      // For instruction files outside ~/.claude/projects/
-      const safe = panelDraft.replace(/'/g, "'\\''");
-      await window.electronAPI?.shell?.exec({ command: `printf '%s' '${safe}' > '${fp}'` });
+      // For instruction files (.md/.json) anywhere under $HOME. The handler
+      // validates the extension allowlist + bounds the write to $HOME.
+      await window.electronAPI?.shell?.writeTextFile({
+        absolutePath: fp,
+        content: panelDraft,
+      });
     }
     setPanelContent(panelDraft);
   }, [panelNode, panelDraft]);
@@ -876,7 +942,11 @@ export default function AgentKnowledgeGraph() {
     }
   }, [hitTest, openPanel]);
 
-  const resetView = () => { transformRef.current = { x: 0, y: 0, scale: 1 }; warmupRef.current = 0; };
+  const resetView = () => {
+    transformRef.current = { x: 0, y: 0, scale: 1 };
+    warmupRef.current = 0;
+    kickSimulationRef.current();
+  };
 
   const zoom = (factor: number) => {
     const t = transformRef.current;
@@ -887,6 +957,7 @@ export default function AgentKnowledgeGraph() {
     const newScale = Math.min(5, Math.max(0.15, t.scale * factor));
     transformRef.current = { scale: newScale, x: cx - (cx - t.x) * (newScale / t.scale), y: cy - (cy - t.y) * (newScale / t.scale) };
     warmupRef.current = 0;
+    kickSimulationRef.current();
   };
 
   return (

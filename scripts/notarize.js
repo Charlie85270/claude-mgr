@@ -14,7 +14,7 @@ exports.default = async function notarizing(context) {
   if (useKeychain) {
     await notarize({
       appPath: `${appOutDir}/${appName}.app`,
-      keychainProfile: 'Dorothy',
+      keychainProfile: process.env.APPLE_KEYCHAIN_PROFILE || 'Echelon',
     });
   } else {
     await notarize({

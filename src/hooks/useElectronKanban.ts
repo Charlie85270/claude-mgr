@@ -169,6 +169,12 @@ export function useKanbanAgentSync(
   const moveTaskRef = useRef(moveTask);
   moveTaskRef.current = moveTask;
 
+  // In-flight set: tracks tasks that have already had a progress:50 update
+  // dispatched but may not yet be reflected in `tasks` state (server round-trip).
+  // Without this, bursts of onStatus events between issue and echo trigger
+  // duplicate IPC writes — cascading kanban SQLite updates during busy agents.
+  const progress50SentRef = useRef<Set<string>>(new Set());
+
   useEffect(() => {
     if (!isElectron()) return;
 
@@ -186,8 +192,14 @@ export function useKanbanAgentSync(
       if (!task || task.column !== 'ongoing') return;
 
       // Only update progress for running status, NOT for completion
-      // Completion is handled by onComplete (PTY exit) which is more reliable
-      if (event.status === 'running' && task.progress < 50) {
+      // Completion is handled by onComplete (PTY exit) which is more reliable.
+      // Dedup via in-flight Set so rapid status events don't storm the API.
+      if (
+        event.status === 'running' &&
+        task.progress < 50 &&
+        !progress50SentRef.current.has(task.id)
+      ) {
+        progress50SentRef.current.add(task.id);
         updateTaskRef.current({ id: task.id, progress: 50 });
       }
     });
@@ -223,6 +235,9 @@ export function useKanbanAgentSync(
 
         updateTaskRef.current({ id: task.id, progress: 100, completionSummary });
         moveTaskRef.current(task.id, 'done');
+        // Task is done — allow future progress:50 dispatches if agent
+        // is ever re-assigned.
+        progress50SentRef.current.delete(task.id);
       }
     });
 

@@ -109,17 +109,14 @@ export default function ProjectsPage() {
 
   // Load git branch for selected project
   const loadGitBranch = useCallback(async (projectPath: string) => {
-    if (!projectPath || typeof window === 'undefined' || !window.electronAPI?.shell?.exec) {
+    if (!projectPath || typeof window === 'undefined' || !window.electronAPI?.shell?.gitInfo) {
       setGitBranch(null);
       return;
     }
 
     setGitLoading(true);
     try {
-      const result = await window.electronAPI.shell.exec({
-        command: 'git branch --show-current 2>/dev/null || git rev-parse --abbrev-ref HEAD 2>/dev/null',
-        cwd: projectPath,
-      });
+      const result = await window.electronAPI.shell.gitInfo({ cwd: projectPath, op: 'branch' });
 
       if (result.success && result.output) {
         const branch = stripAnsi(result.output).replace(/\r/g, '').trim();

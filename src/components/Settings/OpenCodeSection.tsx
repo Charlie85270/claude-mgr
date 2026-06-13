@@ -26,7 +26,7 @@ export const OpenCodeSection = ({ appSettings, onSaveAppSettings, onUpdateLocalS
     setTesting(true);
     setTestResult(null);
     try {
-      const result = await window.electronAPI?.shell?.exec({ command: 'opencode --version' });
+      const result = await window.electronAPI?.shell?.cliProbe({ binary: 'opencode' });
       if (result?.success && result.output) {
         setTestResult({ success: true, message: `OpenCode found: ${result.output.trim()}` });
       } else {

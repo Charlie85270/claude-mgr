@@ -502,7 +502,19 @@ export interface ElectronAPI {
   // Shell operations
   shell: {
     openTerminal: (params: { cwd: string; command?: string }) => Promise<{ success: boolean }>;
-    exec: (params: { command: string; cwd?: string }) => Promise<{ success: boolean; output?: string; error?: string; code?: number }>;
+    // Narrow typed channels (replaced the old exec RCE surface).
+    openPath: (params: { path: string }) => Promise<{ success: boolean; error?: string }>;
+    openWithApp: (params: { app: string; path: string }) => Promise<{ success: boolean; error?: string }>;
+    gitInfo: (params: { cwd: string; op: 'branch' | 'status' | 'diff' | 'log' }) => Promise<{ success: boolean; output?: string; error?: string }>;
+    listFiles: (params: { cwd: string; mode: 'tree' | 'search'; query?: string; maxDepth?: number }) => Promise<{ success: boolean; output?: string; error?: string }>;
+    readFile: (params: { projectRoot: string; relativePath: string; maxLines?: number }) => Promise<{ success: boolean; output?: string; error?: string }>;
+    grepCode: (params: { cwd: string; query: string; extensions?: string[] }) => Promise<{ success: boolean; output?: string; error?: string }>;
+    checkFiles: (params: { paths: string[] }) => Promise<{ success: true; existing: string[] } | { success: false; error: string }>;
+    openExternal: (params: { url: string }) => Promise<{ success: boolean; error?: string }>;
+    cliProbe: (params: { binary: string; binaryPath?: string }) => Promise<{ success: boolean; output?: string; error?: string }>;
+    readFileAbs: (params: { absolutePath: string; maxLines?: number }) => Promise<{ success: boolean; output?: string; error?: string }>;
+    readAny: (params: { paths: string[]; maxLines?: number }) => Promise<{ success: boolean; output?: string; path?: string; error?: string }>;
+    writeTextFile: (params: { absolutePath: string; content: string }) => Promise<{ success: boolean; error?: string }>;
     // Quick terminal PTY
     startPty?: (params: { cwd?: string; cols?: number; rows?: number }) => Promise<string>;
     writePty?: (params: { ptyId: string; data: string }) => Promise<{ success: boolean }>;

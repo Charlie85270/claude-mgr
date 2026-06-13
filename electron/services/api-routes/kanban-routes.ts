@@ -1,4 +1,4 @@
-import { agents, saveAgents } from '../../core/agent-manager';
+import { agents, saveAgents, releaseAgentTracking } from '../../core/agent-manager';
 import { generateTaskFromPrompt } from '../../utils/kanban-generate';
 import { RouteApp, RouteContext } from './types';
 
@@ -74,6 +74,7 @@ export function registerKanbanRoutes(app: RouteApp, ctx: RouteContext): void {
         if (agentToDelete) {
           console.log(`[Kanban] Deleting agent ${task.assignedAgentId} created for task`);
           agents.delete(task.assignedAgentId);
+          releaseAgentTracking(task.assignedAgentId);
         }
       }
 

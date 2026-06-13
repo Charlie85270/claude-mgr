@@ -114,12 +114,24 @@ export function startApiServer(
     const url = new URL(req.url || '/', `http://localhost:${API_PORT}`);
     const pathname = url.pathname;
 
-    // Auth check: exempt local-only endpoints called from hooks/shell scripts
+    // Auth check: exempt only specific local-only endpoints that cannot
+    // authenticate (hook shell scripts don't currently read the API token,
+    // and /api/local-file serves vault image previews to the renderer
+    // behind the app:// protocol).
+    //
+    // Callers like mcp-orchestrator, scheduled launchd tasks (via MCP tool),
+    // and the renderer itself all authenticate via Bearer token — those
+    // endpoints are NOT exempt even if they used to be.
+    const HOOK_PATHS_NO_AUTH: ReadonlySet<string> = new Set([
+      '/api/hooks/status',
+      '/api/hooks/output',
+      '/api/hooks/agent-stopped',
+      '/api/hooks/notification',
+      '/api/hooks/task-completed',
+    ]);
     const authExempt = pathname === '/api/local-file'
       || pathname === '/api/health'
-      || pathname.startsWith('/api/hooks/')
-      || pathname === '/api/kanban/complete'
-      || pathname === '/api/scheduler/status';
+      || HOOK_PATHS_NO_AUTH.has(pathname);
 
     if (!authExempt) {
       const authHeader = req.headers.authorization;

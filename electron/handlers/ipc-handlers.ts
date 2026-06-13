@@ -4,6 +4,7 @@ import { registerMemoryHandlers } from './memory-handlers';
 import { registerObsidianHandlers } from './obsidian-handlers';
 import { registerGwsHandlers } from './gws-handlers';
 import { registerMcpConfigHandlers } from './mcp-config-handlers';
+import { registerTypedShellHandlers } from './shell-handlers';
 import { broadcastToAllWindows } from '../utils/broadcast';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -19,6 +20,7 @@ import { buildFullPath } from '../utils/path-builder';
 import { decodeProjectPath } from '../utils/decode-project-path';
 import { getProvider, getAllProviders } from '../providers';
 import { writeProgrammaticInput } from '../core/pty-manager';
+import { releaseAgentTracking } from '../core/agent-manager';
 import { extractStatusLine } from '../utils/ansi';
 import { scheduleTick } from '../utils/agents-tick';
 
@@ -92,6 +94,7 @@ export function registerIpcHandlers(deps: IpcHandlerDependencies): void {
   registerObsidianHandlers({ getAppSettings: deps.getAppSettings, setAppSettings: deps.setAppSettings, saveAppSettings: deps.saveAppSettings });
   registerGwsHandlers({ getAppSettings: deps.getAppSettings, setAppSettings: deps.setAppSettings, saveAppSettings: deps.saveAppSettings });
   registerMcpConfigHandlers();
+  registerTypedShellHandlers();
   registerApiTokenHandler();
   registerTrayHandlers(deps);
 }
@@ -844,6 +847,7 @@ function registerAgentHandlers(deps: IpcHandlerDependencies): void {
     }
 
     agents.delete(id);
+    releaseAgentTracking(id);
 
     // Save agents to disk
     saveAgents();
@@ -1469,7 +1473,10 @@ function registerAppSettingsHandlers(deps: IpcHandlerDependencies): void {
   ipcMain.handle('telegram:generateAuthToken', async () => {
     const appSettings = getAppSettings();
     const crypto = require('crypto');
-    const newToken = crypto.randomBytes(16).toString('hex');
+    // 32 bytes (256-bit) — same strength as the API token. The Telegram
+    // auth token is the credential for remote agent control over a bot
+    // channel, so it deserves the same bit-width as the HTTP API token.
+    const newToken = crypto.randomBytes(32).toString('hex');
 
     appSettings.telegramAuthToken = newToken;
     saveAppSettings(appSettings);
@@ -2013,33 +2020,15 @@ function registerShellHandlers(deps: IpcHandlerDependencies): void {
     });
   });
 
-  // Execute arbitrary command (uses PTY)
-  ipcMain.handle('shell:exec', async (_event, { command, cwd }: { command: string; cwd?: string }) => {
-    return new Promise((resolve) => {
-      const shell = process.env.SHELL || '/bin/zsh';
-      const ptyProcess = pty.spawn(shell, ['-l', '-c', command], {
-        name: 'xterm-256color',
-        cols: 80,
-        rows: 24,
-        cwd: cwd || os.homedir(),
-        env: process.env as { [key: string]: string },
-      });
-
-      let output = '';
-
-      ptyProcess.onData((data) => {
-        output += data;
-      });
-
-      ptyProcess.onExit(({ exitCode }) => {
-        if (exitCode === 0) {
-          resolve({ success: true, output });
-        } else {
-          resolve({ success: false, error: output, code: exitCode });
-        }
-      });
-    });
-  });
+  // `shell:exec` removed (2026-04-23): was a CRITICAL RCE surface — any
+  // XSS in the renderer could invoke arbitrary shell commands. Replaced
+  // by narrow typed channels in electron/handlers/shell-handlers.ts:
+  //   shell:openPath       — open path with default app (Electron shell.openPath)
+  //   shell:openWithApp    — `open -a <app> <path>` via execFile
+  //   shell:gitInfo        — enumerated git read-only ops via execFile
+  //   shell:listFiles      — `find` with bounded args via execFile
+  //   shell:readFile       — fs.readFile bounded to a project root
+  //   shell:grepCode       — `grep -F` (fixed-string) via execFile
 
   // Start a new quick terminal PTY
   ipcMain.handle('shell:startPty', async (_event, { cwd, cols, rows }: { cwd?: string; cols?: number; rows?: number }) => {

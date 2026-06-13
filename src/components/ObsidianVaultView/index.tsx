@@ -273,8 +273,8 @@ export default function ObsidianVaultView() {
             {activeVault && (
               <button
                 onClick={() => {
-                  window.electronAPI?.shell?.exec({
-                    command: `open "obsidian://open?vault=${encodeURIComponent(activeVault.name)}"`,
+                  window.electronAPI?.shell?.openExternal({
+                    url: `obsidian://open?vault=${encodeURIComponent(activeVault.name)}`,
                   });
                 }}
                 className="flex items-center gap-1.5 px-3 lg:px-4 py-2 text-sm bg-foreground text-background rounded hover:bg-foreground/90 transition-colors shrink-0"

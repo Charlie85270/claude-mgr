@@ -51,8 +51,19 @@ export default function CanvasView() {
     setSelectedNodeId,
     updateAgentPosition,
     updateProjectPosition,
+    pruneStalePositions,
     resetView,
   } = canvasState;
+
+  // Prune stale agent/project positions from localStorage whenever the live
+  // agent list changes. Prevents unbounded growth from long-term agent churn.
+  useEffect(() => {
+    const liveAgentIds = electronAgents.map((a) => a.id);
+    const liveProjectPaths = Array.from(
+      new Set(electronAgents.map((a) => a.projectPath).filter(Boolean) as string[]),
+    );
+    pruneStalePositions(liveAgentIds, liveProjectPaths);
+  }, [electronAgents, pruneStalePositions]);
 
   // Gestures (mouse/touch panning)
   const { isPanning, handlers: gestureHandlers } = useCanvasGestures(canvasState);

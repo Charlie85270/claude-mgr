@@ -50,6 +50,7 @@ export default function TerminalsView() {
   const lastCustomTabRef = useRef<{ type: 'custom'; tabId: string } | null>(null);
   const [terminalFontSize, setTerminalFontSize] = useState(11);
   const pendingStartRef = useRef<{ agentId: string; prompt: string; options?: { model?: string } } | null>(null);
+  const pendingStartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [terminalTheme, setTerminalTheme] = useState<'dark' | 'light'>('dark');
   const [terminalSettingsLoaded, setTerminalSettingsLoaded] = useState(!isElectron());
 
@@ -116,6 +117,10 @@ export default function TerminalsView() {
     const pending = pendingStartRef.current;
     if (pending && pending.agentId === agentId) {
       pendingStartRef.current = null;
+      if (pendingStartTimeoutRef.current) {
+        clearTimeout(pendingStartTimeoutRef.current);
+        pendingStartTimeoutRef.current = null;
+      }
       startAgent(pending.agentId, pending.prompt, pending.options as { model?: string; resume?: boolean }).catch(error => {
         console.error('Failed to start agent after creation:', error);
       });
@@ -271,11 +276,37 @@ export default function TerminalsView() {
     }
     // Defer start until the terminal for this agent is initialized.
     // The onTerminalReady callback will fire startAgent once xterm is ready.
+    // 10s fallback: if the terminal never mounts (e.g. grid has no free slot),
+    // start the agent anyway so it doesn't hang silently in a "created but
+    // not started" state.
     if (prompt) {
       pendingStartRef.current = { agentId: agent.id, prompt, options: { model } };
+      if (pendingStartTimeoutRef.current) clearTimeout(pendingStartTimeoutRef.current);
+      pendingStartTimeoutRef.current = setTimeout(() => {
+        const pending = pendingStartRef.current;
+        if (pending && pending.agentId === agent.id) {
+          console.warn(`[TerminalsView] Terminal for ${agent.id} never initialized after 10s; starting agent directly.`);
+          pendingStartRef.current = null;
+          pendingStartTimeoutRef.current = null;
+          startAgent(agent.id, pending.prompt, pending.options as { model?: string; resume?: boolean }).catch(err => {
+            console.error('Failed to start agent after terminal timeout:', err);
+          });
+        }
+      }, 10_000);
     }
     setShowNewChatModal(false);
-  }, [createAgent, tabManager]);
+  }, [createAgent, tabManager, startAgent]);
+
+  // Clear the pending-start timeout on unmount so a timer doesn't fire after
+  // the view is gone.
+  useEffect(() => {
+    return () => {
+      if (pendingStartTimeoutRef.current) {
+        clearTimeout(pendingStartTimeoutRef.current);
+        pendingStartTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   // Auto-start agents that have no PTY (freshly loaded from disk).
   // Skip agents that already have a live PTY — they're idle but have an

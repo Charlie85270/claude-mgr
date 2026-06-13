@@ -85,6 +85,34 @@ export function useCanvasState() {
     });
   }, []);
 
+  /**
+   * Prune persisted positions for agents/projects that no longer exist.
+   * Without this, localStorage accumulates indefinitely as agents are
+   * created and deleted over the life of the workspace.
+   */
+  const pruneStalePositions = useCallback((liveAgentIds: string[], liveProjectPaths: string[]) => {
+    const agentSet = new Set(liveAgentIds);
+    const projectSet = new Set(liveProjectPaths);
+    setAgentPositions((prev) => {
+      let changed = false;
+      const next: Record<string, { x: number; y: number }> = {};
+      for (const [id, pos] of Object.entries(prev)) {
+        if (agentSet.has(id)) next[id] = pos;
+        else changed = true;
+      }
+      return changed ? next : prev;
+    });
+    setProjectPositions((prev) => {
+      let changed = false;
+      const next: Record<string, { x: number; y: number }> = {};
+      for (const [id, pos] of Object.entries(prev)) {
+        if (projectSet.has(id)) next[id] = pos;
+        else changed = true;
+      }
+      return changed ? next : prev;
+    });
+  }, []);
+
   return {
     // State
     agentPositions,
@@ -101,6 +129,7 @@ export function useCanvasState() {
     // Actions
     updateAgentPosition,
     updateProjectPosition,
+    pruneStalePositions,
     resetView,
     fullReset,
   };

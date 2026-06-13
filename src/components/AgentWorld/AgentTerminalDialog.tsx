@@ -111,9 +111,9 @@ export default function AgentTerminalDialog({
   }, [agent, onStop]);
 
   const handleOpenInFinder = useCallback(async () => {
-    if (!projectPath || !window.electronAPI?.shell?.exec) return;
+    if (!projectPath || !window.electronAPI?.shell?.openPath) return;
     try {
-      await window.electronAPI.shell.exec({ command: `open "${projectPath}"`, cwd: projectPath });
+      await window.electronAPI.shell.openPath({ path: projectPath });
     } catch (err) {
       console.error('Failed to open Finder:', err);
     }

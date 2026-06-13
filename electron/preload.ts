@@ -315,8 +315,32 @@ contextBridge.exposeInMainWorld('electronAPI', {
   shell: {
     openTerminal: (params: { cwd: string; command?: string }) =>
       ipcRenderer.invoke('shell:open-terminal', params),
-    exec: (params: { command: string; cwd?: string }) =>
-      ipcRenderer.invoke('shell:exec', params),
+    // Narrow typed shell channels (replaced shell:exec). Each uses
+    // execFile or a direct fs/Electron API — no subshell, no metachar risk.
+    openPath: (params: { path: string }) =>
+      ipcRenderer.invoke('shell:openPath', params),
+    openWithApp: (params: { app: string; path: string }) =>
+      ipcRenderer.invoke('shell:openWithApp', params),
+    gitInfo: (params: { cwd: string; op: 'branch' | 'status' | 'diff' | 'log' }) =>
+      ipcRenderer.invoke('shell:gitInfo', params),
+    listFiles: (params: { cwd: string; mode: 'tree' | 'search'; query?: string; maxDepth?: number }) =>
+      ipcRenderer.invoke('shell:listFiles', params),
+    readFile: (params: { projectRoot: string; relativePath: string; maxLines?: number }) =>
+      ipcRenderer.invoke('shell:readFile', params),
+    grepCode: (params: { cwd: string; query: string; extensions?: string[] }) =>
+      ipcRenderer.invoke('shell:grepCode', params),
+    checkFiles: (params: { paths: string[] }) =>
+      ipcRenderer.invoke('shell:checkFiles', params),
+    openExternal: (params: { url: string }) =>
+      ipcRenderer.invoke('shell:openExternal', params),
+    cliProbe: (params: { binary: string; binaryPath?: string }) =>
+      ipcRenderer.invoke('shell:cliProbe', params),
+    readFileAbs: (params: { absolutePath: string; maxLines?: number }) =>
+      ipcRenderer.invoke('shell:readFileAbs', params),
+    readAny: (params: { paths: string[]; maxLines?: number }) =>
+      ipcRenderer.invoke('shell:readAny', params),
+    writeTextFile: (params: { absolutePath: string; content: string }) =>
+      ipcRenderer.invoke('shell:writeTextFile', params),
     // Quick terminal PTY
     startPty: (params: { cwd?: string; cols?: number; rows?: number }) =>
       ipcRenderer.invoke('shell:startPty', params),

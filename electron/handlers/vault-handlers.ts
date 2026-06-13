@@ -1,9 +1,29 @@
 import { ipcMain, BrowserWindow } from 'electron';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { getVaultDb } from '../services/vault-db';
-import { VAULT_DIR } from '../constants';
+import { VAULT_DIR, DATA_DIR } from '../constants';
+
+// Source paths refused by vault:attachFile. Prevents the channel from being
+// used to exfiltrate secrets into the vault (which then leaks via share/export
+// or the local-file:// protocol). Paths are compared after path.resolve.
+const ATTACH_FILE_FORBIDDEN_ROOTS: readonly string[] = [
+  path.resolve(DATA_DIR) + path.sep,
+  path.resolve(os.homedir(), '.ssh') + path.sep,
+  path.resolve(os.homedir(), '.aws') + path.sep,
+  path.resolve(os.homedir(), '.gnupg') + path.sep,
+  path.resolve(os.homedir(), 'Library', 'Keychains') + path.sep,
+  path.resolve(os.homedir(), 'Library', 'Application Support', 'Tasmania') + path.sep,
+];
+
+function isForbiddenAttachSource(resolved: string): boolean {
+  for (const root of ATTACH_FILE_FORBIDDEN_ROOTS) {
+    if (resolved === root.slice(0, -1) || resolved.startsWith(root)) return true;
+  }
+  return false;
+}
 
 // Types
 export interface VaultFolder {
@@ -305,18 +325,27 @@ export function registerVaultHandlers(deps: VaultHandlerDependencies): void {
         return { success: false, error: 'Document not found' };
       }
 
+      // Reject attempts to attach files from sensitive directories. This blocks
+      // path-traversal exfiltration of secrets (app-settings.json, SSH keys,
+      // AWS credentials, keychain, Tasmania control-api-token) into the vault.
+      const resolvedSource = path.resolve(params.file_path);
+      if (isForbiddenAttachSource(resolvedSource)) {
+        console.warn('vault:attachFile denied (forbidden source):', resolvedSource);
+        return { success: false, error: 'Cannot attach files from this directory' };
+      }
+
       // Verify source file exists
-      if (!fs.existsSync(params.file_path)) {
+      if (!fs.existsSync(resolvedSource)) {
         return { success: false, error: 'File not found' };
       }
 
       const id = uuidv4();
-      const filename = path.basename(params.file_path);
+      const filename = path.basename(resolvedSource);
       const destFilename = `${id}-${filename}`;
       const destPath = path.join(VAULT_DIR, 'attachments', destFilename);
 
       // Copy file to vault attachments directory
-      fs.copyFileSync(params.file_path, destPath);
+      fs.copyFileSync(resolvedSource, destPath);
 
       const stats = fs.statSync(destPath);
       const ext = path.extname(filename).toLowerCase();

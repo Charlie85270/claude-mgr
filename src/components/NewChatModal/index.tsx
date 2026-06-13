@@ -141,6 +141,14 @@ export default function NewChatModal({
   // Skill installation hook
   const skillInstall = useSkillInstall(handleRefreshSkills);
 
+  // Wrap onClose so dismissing the outer modal also kills any in-flight skill
+  // install PTY. Without this, backdrop click / X button / Cancel leaves the
+  // spawned install process running orphaned in the background.
+  const handleClose = useCallback(() => {
+    skillInstall.closeInstallTerminal();
+    onClose();
+  }, [onClose, skillInstall]);
+
   // Pre-compute installed skill names for the selected provider
   const installedSkillSet = useMemo(() => {
     const set = new Set<string>();
@@ -398,7 +406,7 @@ export default function NewChatModal({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-        onClick={onClose}
+        onClick={handleClose}
       >
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
@@ -413,7 +421,7 @@ export default function NewChatModal({
               <StepIndicator currentStep={step} onStepClick={setStep} />
             </div>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="p-2 rounded-lg hover:bg-bg-tertiary transition-colors ml-2"
             >
               <X className="w-5 h-5" />
@@ -510,7 +518,7 @@ export default function NewChatModal({
 
             <div className="flex items-center gap-3">
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
               >
                 Cancel

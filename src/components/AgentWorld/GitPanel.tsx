@@ -135,28 +135,16 @@ export default function GitPanel({ projectPath, className = '', hideHeader = fal
 
   // Load git data
   const loadGitData = useCallback(async () => {
-    if (!projectPath || !window.electronAPI?.shell?.exec) return;
+    if (!projectPath || !window.electronAPI?.shell?.gitInfo) return;
 
     setLoading(true);
 
     try {
       const [branchResult, statusResult, diffResult, logResult] = await Promise.all([
-        window.electronAPI.shell.exec({
-          command: 'git branch --show-current 2>/dev/null || git rev-parse --abbrev-ref HEAD 2>/dev/null',
-          cwd: projectPath,
-        }),
-        window.electronAPI.shell.exec({
-          command: 'git status --porcelain --untracked-files=all 2>/dev/null',
-          cwd: projectPath,
-        }),
-        window.electronAPI.shell.exec({
-          command: 'git diff --stat 2>/dev/null | tail -20',
-          cwd: projectPath,
-        }),
-        window.electronAPI.shell.exec({
-          command: 'git log --oneline --pretty=format:"%h|%s|%an|%ar" -10 2>/dev/null',
-          cwd: projectPath,
-        }),
+        window.electronAPI.shell.gitInfo({ cwd: projectPath, op: 'branch' }),
+        window.electronAPI.shell.gitInfo({ cwd: projectPath, op: 'status' }),
+        window.electronAPI.shell.gitInfo({ cwd: projectPath, op: 'diff' }),
+        window.electronAPI.shell.gitInfo({ cwd: projectPath, op: 'log' }),
       ]);
 
       const branch =
@@ -222,11 +210,9 @@ export default function GitPanel({ projectPath, className = '', hideHeader = fal
 
   // Open project in Cursor IDE
   const handleOpenInCursor = useCallback(async () => {
-    if (!projectPath || !window.electronAPI?.shell?.exec) return;
+    if (!projectPath || !window.electronAPI?.shell?.openWithApp) return;
     try {
-      await window.electronAPI.shell.exec({
-        command: `open -a "Cursor" "${projectPath}"`,
-      });
+      await window.electronAPI.shell.openWithApp({ app: 'Cursor', path: projectPath });
     } catch (err) {
       console.error('Failed to open in Cursor:', err);
     }
