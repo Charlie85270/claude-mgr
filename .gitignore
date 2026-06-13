@@ -62,6 +62,11 @@ electron/dist
 
 .idea
 
+# scratch / smoke-test artifacts (not source)
+.playwright-mcp/
+smoke-*.png
+entities.json
+
 # factor-echelon (absorbed from team-factory)
 *.tgz
 *.tar.gz
