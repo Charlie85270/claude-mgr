@@ -323,6 +323,13 @@ registerProtocolSchemes();
 app.whenReady().then(async () => {
   console.log('App ready, initializing...');
 
+  // Migrate ~/.dorothy -> ~/.echelon BEFORE the data dir is created.
+  // migrateFromDorothy() bails if DATA_DIR already exists (so it never clobbers
+  // real Echelon data). It therefore MUST run before ensureDataDir() and
+  // ensureEchelonClaudeMd() create ~/.echelon — otherwise the guard always trips
+  // and every Dorothy upgrader silently loses their data.
+  migrateFromDorothy();
+
   // Ensure data directory exists
   ensureDataDir();
 
@@ -342,11 +349,15 @@ app.whenReady().then(async () => {
     // ignore statusline errors on startup
   }
 
-  // Migrate data from ~/.dorothy if it exists (Dorothy → Echelon rebrand)
-  migrateFromDorothy();
-
-  // Migrate data from ~/.claude-manager if it exists (legacy rebrand migration)
+  // Migrate data from ~/.claude-manager if it exists (legacy rebrand migration).
+  // Safe to run after ensureDataDir(): it copies item-by-item and skips anything
+  // that already exists in ~/.echelon.
   migrateFromClaudeManager();
+
+  // Reload settings now that migrations may have populated app-settings.json, so
+  // the migrated configuration takes effect in this first post-migration session
+  // (consumers read appSettings via getters, so reassigning the binding is safe).
+  appSettings = loadAppSettings();
 
   // Load agents from disk
   loadAgents();
