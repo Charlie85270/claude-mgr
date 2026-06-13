@@ -185,7 +185,16 @@ function loadAppSettings(): AppSettings {
 function saveAppSettingsToFile(settings: AppSettings) {
   try {
     ensureDataDir();
-    fs.writeFileSync(APP_SETTINGS_FILE, JSON.stringify(settings, null, 2));
+    // app-settings.json holds plaintext third-party credentials (Telegram,
+    // Slack, Jira, X/OAuth, Grok). Restrict to owner-only (0600). writeFileSync
+    // mode only applies when the file is created, so chmod enforces it on any
+    // pre-existing file that was written world-readable by an older build.
+    fs.writeFileSync(APP_SETTINGS_FILE, JSON.stringify(settings, null, 2), { mode: 0o600 });
+    try {
+      fs.chmodSync(APP_SETTINGS_FILE, 0o600);
+    } catch {
+      // best-effort: some platforms/filesystems (e.g. Windows) lack POSIX perms
+    }
   } catch (err) {
     console.error('Failed to save app settings:', err);
   }
