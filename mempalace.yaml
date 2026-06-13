@@ -1,0 +1,22 @@
+wing: dev
+rooms:
+- name: echelon
+  description: Echelon desktop app — Electron + Next.js hosting factor-echelon team factory
+  keywords:
+  - echelon
+  - factor-echelon
+  - seasons
+  - counselor
+  - convener
+  - cartograph
+  - scribe
+  - team factory
+  - archetype
+  - soul package
+  - review gate
+  - titans_rift
+  - plan 11
+  - plan 12
+- name: general
+  description: Files that don't fit other rooms
+  keywords: []
