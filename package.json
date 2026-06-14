@@ -34,7 +34,7 @@
     "publish": {
       "provider": "github",
       "owner": "jediswimmer",
-      "repo": "echelon"
+      "repo": "Echelon"
     },
     "directories": {
       "output": "release"
