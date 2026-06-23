@@ -231,30 +231,35 @@ describe('automation-handlers', () => {
   });
 
   describe('automation:run', () => {
+    // automation:run validates the id as a strict UUIDv4 before building a
+    // filesystem path, so fixtures must use real UUIDs (not slugs like 'run-1').
+    const RUN_ID = '11111111-1111-4111-8111-111111111111';
+    const NO_SCRIPT_ID = '22222222-2222-4222-8222-222222222222';
+
     it('runs automation script if it exists', async () => {
       writeTmpJson('.echelon/automations.json', [
-        { id: 'run-1', name: 'Run Me', enabled: true, schedule: { type: 'interval', intervalMinutes: 60 },
+        { id: RUN_ID, name: 'Run Me', enabled: true, schedule: { type: 'interval', intervalMinutes: 60 },
           source: { type: 'github', config: {} }, trigger: { eventTypes: [], onNewItem: true },
           agent: { enabled: false, prompt: '' }, outputs: [] },
       ]);
       const scriptsDir = path.join(tmpDir, '.echelon', 'scripts');
       fs.mkdirSync(scriptsDir, { recursive: true });
-      fs.writeFileSync(path.join(scriptsDir, 'automation-run-1.sh'), '#!/bin/bash');
+      fs.writeFileSync(path.join(scriptsDir, `automation-${RUN_ID}.sh`), '#!/bin/bash');
 
       await registerHandlers();
-      const result = await invokeHandler('automation:run', 'run-1') as { success: boolean };
+      const result = await invokeHandler('automation:run', RUN_ID) as { success: boolean };
       expect(result.success).toBe(true);
     });
 
     it('returns error when script not found', async () => {
       writeTmpJson('.echelon/automations.json', [
-        { id: 'no-script', name: 'No Script', enabled: true, schedule: { type: 'interval', intervalMinutes: 60 },
+        { id: NO_SCRIPT_ID, name: 'No Script', enabled: true, schedule: { type: 'interval', intervalMinutes: 60 },
           source: { type: 'github', config: {} }, trigger: { eventTypes: [], onNewItem: true },
           agent: { enabled: false, prompt: '' }, outputs: [] },
       ]);
 
       await registerHandlers();
-      const result = await invokeHandler('automation:run', 'no-script') as { success: boolean; error: string };
+      const result = await invokeHandler('automation:run', NO_SCRIPT_ID) as { success: boolean; error: string };
       expect(result.success).toBe(false);
       expect(result.error).toBe('Automation script not found');
     });

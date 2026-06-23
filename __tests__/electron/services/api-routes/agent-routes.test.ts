@@ -25,6 +25,7 @@ vi.mock('../../../../electron/core/agent-manager', () => ({
   agents: new Map(),
   saveAgents: vi.fn(),
   initAgentPty: vi.fn(),
+  releaseAgentTracking: vi.fn(),
 }));
 
 vi.mock('../../../../electron/core/pty-manager', () => ({

@@ -34,6 +34,7 @@ vi.mock('../../../electron/services/vault-db', () => ({
 
 vi.mock('../../../electron/constants', () => ({
   VAULT_DIR: '/mock/vault',
+  DATA_DIR: '/mock/data',
 }));
 
 function invokeHandler(channel: string, ...args: unknown[]): Promise<unknown> {
