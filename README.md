@@ -594,8 +594,47 @@ stale, rebuilds the native modules against the Electron ABI, and starts
 - Port 3000 must be free — `next dev` silently falls back to another port and the
   Electron window would then wait forever for `http://localhost:3000`.
 
-Packaging is macOS-only for now (`electron:build` / `electron:pack` pass `--mac`);
-this script covers development mode.
+This script covers development mode. To produce installable packages, see
+[Linux Packages](#linux-packages) below.
+
+### Linux Packages
+
+```bash
+npm run electron:build:linux              # All targets
+npm run electron:pack:linux               # Unpacked build only (fast, for testing)
+bash scripts/build-linux.sh AppImage deb  # Only specific targets
+bash scripts/build-linux.sh --help
+```
+
+Output in `release/` (x64):
+
+| Artifact | For |
+|---|---|
+| `Dorothy-<version>.AppImage` | Any distribution — no install, just `chmod +x` and run |
+| `dorothy_<version>_amd64.deb` | Debian, Ubuntu, Mint |
+| `dorothy-<version>.x86_64.rpm` | Fedora, RHEL, openSUSE |
+| `dorothy-<version>.tar.gz` | Generic unpack-and-run archive |
+
+Building deb and rpm needs `fakeroot` and `rpm` on the build host:
+
+```bash
+sudo apt install -y fakeroot rpm
+```
+
+**Notes:**
+
+- Artifacts are built against the glibc of the build host, so they run on that
+  release and newer. Building on Ubuntu 24.04 produces packages that will not start
+  on Ubuntu 22.04 or Debian 12. Build inside `electronuserland/builder` if you need
+  to support older distributions.
+- The deb/rpm post-install script tests whether unprivileged user namespaces work
+  and only makes `chrome-sandbox` SUID root when they do not, so Electron's sandbox
+  stays enabled where possible. AppImage cannot do this — on kernels that restrict
+  unprivileged user namespaces (Ubuntu 24.04+), AppImage users may need to launch
+  with `--no-sandbox`.
+- Auto-updates need `latest-linux.yml` (generated into `release/`) published
+  alongside the artifacts on the GitHub release, otherwise the updater logs a 404
+  and falls back to the GitHub API.
 
 ### Web Browser (Development)
 
