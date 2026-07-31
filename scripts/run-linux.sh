@@ -183,6 +183,9 @@ install_dependencies() {
   if dependencies_stale; then
     log "Installing dependencies (npm install) — this takes a few minutes on a fresh checkout..."
     npm install
+    # An install can restore the Node-ABI build of a native module, so the
+    # cached Electron rebuild can no longer be trusted.
+    rm -f "$REBUILD_STAMP"
   else
     log "Dependencies are up to date."
   fi
