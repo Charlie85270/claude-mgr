@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:network": "next dev -H 0.0.0.0",
+    "dev:linux": "bash scripts/run-linux.sh",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
