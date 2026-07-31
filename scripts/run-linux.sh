@@ -95,19 +95,22 @@ check_prerequisites() {
     problems+=("npm is not installed (it ships with Node.js).")
   fi
 
-  # better-sqlite3 and node-pty have no prebuilt binaries for the Electron ABI,
-  # so node-gyp compiles them from source here.
-  if ! command -v python3 >/dev/null 2>&1; then
-    problems+=("python3 is not installed — node-gyp needs it to build better-sqlite3 and node-pty.")
-    apt_packages+=("python3")
-  fi
+  # better-sqlite3 and node-pty have no prebuilt binaries for the Electron ABI, so
+  # node-gyp compiles them from source. That only happens when this run may install
+  # dependencies or rebuild them — "--web --skip-install" compiles nothing.
+  if [ "$SKIP_INSTALL" -eq 0 ] || [ "$WEB_MODE" -eq 0 ]; then
+    if ! command -v python3 >/dev/null 2>&1; then
+      problems+=("python3 is not installed — node-gyp needs it to build better-sqlite3 and node-pty.")
+      apt_packages+=("python3")
+    fi
 
-  local -a missing_toolchain=()
-  command -v make >/dev/null 2>&1 || missing_toolchain+=("make")
-  command -v g++ >/dev/null 2>&1 || missing_toolchain+=("g++")
-  if [ ${#missing_toolchain[@]} -gt 0 ]; then
-    problems+=("No C++ toolchain (missing: ${missing_toolchain[*]}) — better-sqlite3 and node-pty compile from source.")
-    apt_packages+=("build-essential")
+    local -a missing_toolchain=()
+    command -v make >/dev/null 2>&1 || missing_toolchain+=("make")
+    command -v g++ >/dev/null 2>&1 || missing_toolchain+=("g++")
+    if [ ${#missing_toolchain[@]} -gt 0 ]; then
+      problems+=("No C++ toolchain (missing: ${missing_toolchain[*]}) — better-sqlite3 and node-pty compile from source.")
+      apt_packages+=("build-essential")
+    fi
   fi
 
   if [ ${#problems[@]} -eq 0 ]; then
@@ -269,6 +272,11 @@ cleanup() {
 
 launch() {
   local -a command
+
+  # Installing and rebuilding can take minutes, so re-check as close to the spawn
+  # as possible: something else may have taken the port in the meantime.
+  check_port_free
+
   if [ "$WEB_MODE" -eq 1 ]; then
     command=(npm run dev)
     log "Starting browser-only mode — open http://localhost:${DEV_PORT} (Ctrl-C to stop)."

@@ -535,7 +535,7 @@ MCP server for Twitter/X data via the SocialData API. See [SocialData (Twitter/X
 
 ### Prerequisites
 
-- **Node.js** 18+
+- **Node.js** 22 — the version pinned in `.nvmrc`
 - **npm** or yarn
 - **Claude Code CLI**: `npm install -g @anthropic-ai/claude-code`
 - **GitHub CLI** (`gh`) — required for GitHub automations
