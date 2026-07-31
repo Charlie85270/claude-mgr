@@ -1989,13 +1989,94 @@ function registerTasmaniaHandlers(deps: IpcHandlerDependencies): void {
 
 // ============== Shell IPC Handlers ==============
 
+// Terminal emulators tried in order on Linux. `x-terminal-emulator` is the Debian
+// alternatives symlink, so it comes first and honours whatever the user picked;
+// Debian Policy requires anything registered there to accept `-e command args...`.
+// Each entry says how that emulator takes a working directory and a command —
+// the flags are not interchangeable between them.
+const LINUX_TERMINALS: Array<{
+  bin: string;
+  cwdArgs: (cwd: string) => string[];
+  execArgs: (shell: string, payload: string) => string[];
+}> = [
+  { bin: 'x-terminal-emulator', cwdArgs: () => [], execArgs: (s, p) => ['-e', s, '-lc', p] },
+  { bin: 'gnome-terminal', cwdArgs: (cwd) => [`--working-directory=${cwd}`], execArgs: (s, p) => ['--', s, '-lc', p] },
+  { bin: 'konsole', cwdArgs: (cwd) => ['--workdir', cwd], execArgs: (s, p) => ['-e', s, '-lc', p] },
+  { bin: 'xfce4-terminal', cwdArgs: (cwd) => [`--working-directory=${cwd}`], execArgs: (s, p) => ['-x', s, '-lc', p] },
+  { bin: 'alacritty', cwdArgs: (cwd) => ['--working-directory', cwd], execArgs: (s, p) => ['-e', s, '-lc', p] },
+  { bin: 'kitty', cwdArgs: (cwd) => ['--directory', cwd], execArgs: (s, p) => [s, '-lc', p] },
+  { bin: 'wezterm', cwdArgs: (cwd) => ['start', '--cwd', cwd], execArgs: (s, p) => ['--', s, '-lc', p] },
+  { bin: 'xterm', cwdArgs: () => [], execArgs: (s, p) => ['-e', s, '-lc', p] },
+];
+
+// A GUI Electron process can inherit a minimal PATH, so search the usual bin
+// directories too rather than trusting PATH alone.
+function findExecutable(name: string): string | null {
+  const dirs = [
+    ...(process.env.PATH || '').split(path.delimiter),
+    '/usr/local/bin',
+    '/usr/bin',
+    '/bin',
+    '/snap/bin',
+  ];
+  for (const dir of dirs) {
+    if (!dir) continue;
+    const candidate = path.join(dir, name);
+    try {
+      fs.accessSync(candidate, fs.constants.X_OK);
+      return candidate;
+    } catch {
+      // Not here — keep looking
+    }
+  }
+  return null;
+}
+
 function registerShellHandlers(deps: IpcHandlerDependencies): void {
   const { quickPtyProcesses, getMainWindow } = deps;
 
   // Open in external terminal
   ipcMain.handle('shell:open-terminal', async (_event, { cwd, command }: { cwd: string; command?: string }) => {
-    const shell = process.env.SHELL || '/bin/zsh';
+    const shell = process.env.SHELL || (os.platform() === 'darwin' ? '/bin/zsh' : '/bin/bash');
     const escapedCwd = cwd.replace(/'/g, "'\\''");
+
+    if (os.platform() !== 'darwin') {
+      const terminal = LINUX_TERMINALS.map(t => ({ ...t, binPath: findExecutable(t.bin) }))
+        .find(t => t.binPath !== null);
+
+      if (!terminal) {
+        return {
+          success: false,
+          error: `No terminal emulator found. Install one of: ${LINUX_TERMINALS.map(t => t.bin).join(', ')}.`,
+        };
+      }
+
+      // The cwd goes through the payload as well as the emulator's own flag: a
+      // client/server emulator opens the window from the server's directory, not
+      // from this process's. The trailing exec keeps the window open afterwards,
+      // the way Terminal.app's `do script` does.
+      const payload = command
+        ? `cd '${escapedCwd}' && ${command}; exec ${shell} -l`
+        : `cd '${escapedCwd}'; exec ${shell} -l`;
+      const args = [...terminal.cwdArgs(cwd), ...terminal.execArgs(shell, payload)];
+
+      try {
+        const { spawn } = await import('child_process');
+        const child = spawn(terminal.binPath as string, args, {
+          cwd,
+          detached: true,
+          stdio: 'ignore',
+          env: process.env,
+        });
+        child.unref();
+      } catch (err) {
+        return { success: false, error: `Failed to launch ${terminal.bin}: ${String(err)}` };
+      }
+
+      // The emulator outlives this call, so report success once it is launched.
+      return { success: true };
+    }
+
     const script = command
       ? `tell application "Terminal" to do script "cd '${escapedCwd}' && ${command}"`
       : `tell application "Terminal" to do script "cd '${escapedCwd}'"`;
