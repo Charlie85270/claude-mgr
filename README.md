@@ -610,7 +610,7 @@ Output in `release/` (x64):
 
 | Artifact | For |
 |---|---|
-| `Dorothy-<version>.AppImage` | Any distribution — no install, just `chmod +x` and run |
+| `Dorothy-<version>.AppImage` | No install, just `chmod +x` and run — on any distribution whose glibc is at least as new as the build host's (see the note below) |
 | `dorothy_<version>_amd64.deb` | Debian, Ubuntu, Mint |
 | `dorothy-<version>.x86_64.rpm` | Fedora, RHEL, openSUSE |
 | `dorothy-<version>.tar.gz` | Generic unpack-and-run archive |

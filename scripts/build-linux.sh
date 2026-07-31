@@ -61,6 +61,13 @@ done
 
 [ -d node_modules ] || die "node_modules/ is missing — run 'npm install' first."
 
+# Two builds staging sources at once would move one another's directories around,
+# so hold an exclusive lock for the whole run.
+if command -v flock >/dev/null 2>&1; then
+  exec 9>node_modules/.dorothy-build-linux.lock
+  flock -n 9 || die "another Linux build is already running in this checkout."
+fi
+
 # Next.js cannot statically export API routes, and src/app/icon.tsx conflicts with
 # the packaged icon, so both are moved aside for the duration of the build.
 restore_sources() {
@@ -71,6 +78,27 @@ restore_sources() {
     mv src/app/_icon_backup.tsx src/app/icon.tsx
   fi
 }
+
+# A killed build leaves the sources staged. Put them back before staging again —
+# otherwise "mv src/app/api src/app/_api_backup" nests the routes inside the stale
+# backup and restoring produces src/app/api/api.
+recover_staged_sources() {
+  if [ -d src/app/_api_backup ]; then
+    if [ -d src/app/api ]; then
+      die "both src/app/api and src/app/_api_backup exist — an interrupted build left the tree inconsistent. Reconcile them by hand, then re-run."
+    fi
+    log "Restoring sources staged by an interrupted build..."
+    mv src/app/_api_backup src/app/api
+  fi
+  if [ -f src/app/_icon_backup.tsx ]; then
+    if [ -f src/app/icon.tsx ]; then
+      die "both src/app/icon.tsx and src/app/_icon_backup.tsx exist — an interrupted build left the tree inconsistent. Reconcile them by hand, then re-run."
+    fi
+    mv src/app/_icon_backup.tsx src/app/icon.tsx
+  fi
+}
+
+recover_staged_sources
 
 log "Preparing sources for static export..."
 if [ -d src/app/api ]; then
