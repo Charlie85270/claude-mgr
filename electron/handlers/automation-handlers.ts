@@ -223,8 +223,24 @@ async function getClaudePath(): Promise<string> {
   return getCLIPath('claude');
 }
 
-// Create launchd job for automation (macOS)
-async function createAutomationLaunchdJob(automation: Automation): Promise<void> {
+function automationScriptPath(automationId: string): string {
+  return path.join(os.homedir(), '.dorothy', 'scripts', `automation-${automationId}.sh`);
+}
+
+// Marker appended to the crontab line so it can be found again on disable/delete.
+// Distinct from the scheduler's `dorothy-<taskId>` so neither can match the other.
+function automationCronMarker(automationId: string): string {
+  return `dorothy-automation-${automationId}`;
+}
+
+// Write the runner script both the launchd job and the cron job point at.
+// `automation:run` executes the same script, so it is needed on every platform.
+async function writeAutomationScript(automation: Automation): Promise<{
+  scriptPath: string;
+  logPath: string;
+  errorLogPath: string;
+  cronSchedule: string;
+}> {
   const automationProvider: AgentProvider = automation.agent.provider || getDefaultProvider();
   const claudePath = await getCLIPath(automationProvider);
   const claudeDir = path.dirname(claudePath);
@@ -237,8 +253,6 @@ async function createAutomationLaunchdJob(automation: Automation): Promise<void>
     cronSchedule = intervalToCron(automation.schedule.intervalMinutes || 60);
   }
 
-  const [minute, hour, dayOfMonth, , dayOfWeek] = cronSchedule.split(' ');
-
   const logPath = path.join(os.homedir(), '.dorothy', 'logs', `automation-${automation.id}.log`);
   const errorLogPath = path.join(os.homedir(), '.dorothy', 'logs', `automation-${automation.id}.error.log`);
   const logsDir = path.dirname(logPath);
@@ -247,7 +261,7 @@ async function createAutomationLaunchdJob(automation: Automation): Promise<void>
   }
 
   // Create script to run
-  const scriptPath = path.join(os.homedir(), '.dorothy', 'scripts', `automation-${automation.id}.sh`);
+  const scriptPath = automationScriptPath(automation.id);
   const scriptsDir = path.dirname(scriptPath);
   if (!fs.existsSync(scriptsDir)) {
     fs.mkdirSync(scriptsDir, { recursive: true });
@@ -275,6 +289,15 @@ async function createAutomationLaunchdJob(automation: Automation): Promise<void>
 
   fs.writeFileSync(scriptPath, scriptContent);
   fs.chmodSync(scriptPath, '755');
+
+  return { scriptPath, logPath, errorLogPath, cronSchedule };
+}
+
+// Create launchd job for automation (macOS)
+async function createAutomationLaunchdJob(automation: Automation): Promise<void> {
+  const { scriptPath, logPath, errorLogPath, cronSchedule } = await writeAutomationScript(automation);
+
+  const [minute, hour, dayOfMonth, , dayOfWeek] = cronSchedule.split(' ');
 
   // Build StartCalendarInterval or StartInterval
   const label = `com.dorothy.automation.${automation.id}`;
@@ -341,7 +364,7 @@ ${scheduleXml}
 async function removeAutomationLaunchdJob(automationId: string): Promise<void> {
   const label = `com.dorothy.automation.${automationId}`;
   const plistPath = path.join(os.homedir(), 'Library', 'LaunchAgents', `${label}.plist`);
-  const scriptPath = path.join(os.homedir(), '.dorothy', 'scripts', `automation-${automationId}.sh`);
+  const scriptPath = automationScriptPath(automationId);
 
   // Unload from launchd
   const uid = process.getuid?.() || 501;
@@ -359,6 +382,82 @@ async function removeAutomationLaunchdJob(automationId: string): Promise<void> {
   // Remove script file
   if (fs.existsSync(scriptPath)) {
     fs.unlinkSync(scriptPath);
+  }
+}
+
+// Read the current crontab. An empty crontab and a missing `crontab` binary both
+// read as empty, matching how the scheduler treats them.
+function readCrontab(): Promise<string> {
+  return new Promise((resolve) => {
+    const proc = spawn('crontab', ['-l']);
+    let output = '';
+    proc.stdout.on('data', (data) => { output += data; });
+    proc.on('close', () => resolve(output));
+    proc.on('error', () => resolve(''));
+  });
+}
+
+function writeCrontab(content: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const proc = spawn('crontab', ['-']);
+    proc.stdin.write(content);
+    proc.stdin.end();
+    proc.on('close', (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`crontab failed with code ${code}`));
+    });
+    proc.on('error', reject);
+  });
+}
+
+function withoutMarker(crontab: string, marker: string): string[] {
+  const lines = crontab.split('\n').filter(line => !line.includes(marker));
+  while (lines.length > 0 && lines[lines.length - 1].trim() === '') {
+    lines.pop();
+  }
+  return lines;
+}
+
+// Create cron job for automation (Linux)
+async function createAutomationCronJob(automation: Automation): Promise<void> {
+  const { scriptPath, cronSchedule } = await writeAutomationScript(automation);
+  const marker = automationCronMarker(automation.id);
+
+  const lines = withoutMarker(await readCrontab(), marker);
+  lines.push(`${cronSchedule} ${scriptPath} # ${marker}`);
+
+  await writeCrontab(lines.join('\n') + '\n');
+}
+
+// Remove cron job for automation (Linux)
+async function removeAutomationCronJob(automationId: string): Promise<void> {
+  const marker = automationCronMarker(automationId);
+  const existing = await readCrontab();
+
+  if (existing.includes(marker)) {
+    const lines = withoutMarker(existing, marker);
+    await writeCrontab(lines.length > 0 ? lines.join('\n') + '\n' : '');
+  }
+
+  const scriptPath = automationScriptPath(automationId);
+  if (fs.existsSync(scriptPath)) {
+    fs.unlinkSync(scriptPath);
+  }
+}
+
+async function registerAutomationJob(automation: Automation): Promise<void> {
+  if (os.platform() === 'darwin') {
+    await createAutomationLaunchdJob(automation);
+  } else {
+    await createAutomationCronJob(automation);
+  }
+}
+
+async function unregisterAutomationJob(automationId: string): Promise<void> {
+  if (os.platform() === 'darwin') {
+    await removeAutomationLaunchdJob(automationId);
+  } else {
+    await removeAutomationCronJob(automationId);
   }
 }
 
@@ -459,10 +558,8 @@ export function registerAutomationHandlers(): void {
       automations.push(newAutomation);
       saveAutomations(automations);
 
-      // Create launchd job on macOS
-      if (os.platform() === 'darwin') {
-        await createAutomationLaunchdJob(newAutomation);
-      }
+      // Register the scheduled job (launchd on macOS, crontab elsewhere)
+      await registerAutomationJob(newAutomation);
 
       return { success: true, automationId: newAutomation.id };
     } catch (err) {
@@ -495,14 +592,12 @@ export function registerAutomationHandlers(): void {
 
       saveAutomations(automations);
 
-      // Handle enable/disable of launchd job
-      if (os.platform() === 'darwin' && params.enabled !== undefined && params.enabled !== wasEnabled) {
+      // Handle enable/disable of the scheduled job
+      if (params.enabled !== undefined && params.enabled !== wasEnabled) {
         if (params.enabled) {
-          // Re-create the launchd job
-          await createAutomationLaunchdJob(automations[index]);
+          await registerAutomationJob(automations[index]);
         } else {
-          // Remove the launchd job
-          await removeAutomationLaunchdJob(id);
+          await unregisterAutomationJob(id);
         }
       }
 
@@ -525,10 +620,8 @@ export function registerAutomationHandlers(): void {
       automations.splice(index, 1);
       saveAutomations(automations);
 
-      // Remove launchd job on macOS
-      if (os.platform() === 'darwin') {
-        await removeAutomationLaunchdJob(id);
-      }
+      // Remove the scheduled job (launchd on macOS, crontab elsewhere)
+      await unregisterAutomationJob(id);
 
       return { success: true };
     } catch (err) {
@@ -547,7 +640,7 @@ export function registerAutomationHandlers(): void {
       }
 
       // Run the script directly
-      const scriptPath = path.join(os.homedir(), '.dorothy', 'scripts', `automation-${id}.sh`);
+      const scriptPath = automationScriptPath(id);
       if (fs.existsSync(scriptPath)) {
         spawn('bash', [scriptPath], {
           detached: true,

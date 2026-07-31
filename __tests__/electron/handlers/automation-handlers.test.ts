@@ -16,14 +16,30 @@ vi.mock('electron', () => ({
   },
 }));
 
+// Fake crontab: `crontab -l` prints it, `crontab -` replaces it.
+let crontab: string;
+
 vi.mock('child_process', () => ({
-  spawn: vi.fn(() => ({
-    stdout: { on: vi.fn() },
-    stderr: { on: vi.fn() },
-    stdin: { write: vi.fn(), end: vi.fn() },
-    on: vi.fn((event: string, cb: () => void) => { if (event === 'close') cb(); }),
-    unref: vi.fn(),
-  })),
+  spawn: vi.fn((cmd: string, args: string[] = []) => {
+    const isCrontabRead = cmd === 'crontab' && args[0] === '-l';
+    const isCrontabWrite = cmd === 'crontab' && args[0] === '-';
+    let written = '';
+
+    return {
+      stdout: {
+        on: vi.fn((event: string, cb: (data: string) => void) => {
+          if (event === 'data' && isCrontabRead && crontab) cb(crontab);
+        }),
+      },
+      stderr: { on: vi.fn() },
+      stdin: {
+        write: vi.fn((data: string) => { written += data; }),
+        end: vi.fn(() => { if (isCrontabWrite) crontab = written; }),
+      },
+      on: vi.fn((event: string, cb: (...a: unknown[]) => void) => { if (event === 'close') cb(0); }),
+      unref: vi.fn(),
+    };
+  }),
 }));
 
 vi.mock('os', async (importOriginal) => {
@@ -42,6 +58,7 @@ function invokeHandler(channel: string, ...args: unknown[]): Promise<unknown> {
 beforeEach(() => {
   vi.resetModules();
   handlers = new Map();
+  crontab = '';
   tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'auto-test-'));
 });
 
@@ -227,6 +244,102 @@ describe('automation-handlers', () => {
       const result = await invokeHandler('automation:delete', 'nope') as { success: boolean; error: string };
       expect(result.success).toBe(false);
       expect(result.error).toBe('Automation not found');
+    });
+  });
+
+  describe('cron scheduling on Linux', () => {
+    const stored = (id: string) => ({
+      id, name: 'Cron Me', enabled: true, createdAt: '2026-01-01', updatedAt: '2026-01-01',
+      schedule: { type: 'interval' as const, intervalMinutes: 30 },
+      source: { type: 'github', config: {} },
+      trigger: { eventTypes: [], onNewItem: true },
+      agent: { enabled: false, prompt: '' }, outputs: [],
+    });
+
+    it('adds a crontab line and a runner script on create', async () => {
+      // given
+      await registerHandlers();
+
+      // when
+      const result = await invokeHandler('automation:create', {
+        name: 'Cron Me',
+        sourceType: 'github',
+        sourceConfig: '{}',
+        scheduleMinutes: 30,
+      }) as { success: boolean; automationId: string };
+
+      // then
+      expect(result.success).toBe(true);
+      expect(crontab).toContain(`# dorothy-automation-${result.automationId}`);
+      expect(crontab).toContain('*/30 * * * *');
+      expect(fs.existsSync(path.join(tmpDir, '.dorothy', 'scripts', `automation-${result.automationId}.sh`))).toBe(true);
+    });
+
+    it('uses an explicit cron expression when one is given', async () => {
+      // given
+      await registerHandlers();
+
+      // when
+      const result = await invokeHandler('automation:create', {
+        name: 'Weekday Cron',
+        sourceType: 'rss',
+        sourceConfig: '{}',
+        scheduleCron: '0 9 * * 1-5',
+      }) as { automationId: string };
+
+      // then
+      expect(crontab).toContain(`0 9 * * 1-5 ${path.join(tmpDir, '.dorothy', 'scripts', `automation-${result.automationId}.sh`)} # dorothy-automation-${result.automationId}`);
+    });
+
+    it('removes the crontab line when disabled and restores it when re-enabled', async () => {
+      // given
+      writeTmpJson('.dorothy/automations.json', [stored('tog-1')]);
+      await registerHandlers();
+
+      // when
+      await invokeHandler('automation:update', 'tog-1', { enabled: false });
+
+      // then
+      expect(crontab).not.toContain('dorothy-automation-tog-1');
+
+      // when
+      await invokeHandler('automation:update', 'tog-1', { enabled: true });
+
+      // then
+      expect(crontab).toContain('# dorothy-automation-tog-1');
+    });
+
+    it('removes the crontab line and the script on delete', async () => {
+      // given
+      writeTmpJson('.dorothy/automations.json', [stored('del-cron')]);
+      await registerHandlers();
+      await invokeHandler('automation:update', 'del-cron', { enabled: false });
+      await invokeHandler('automation:update', 'del-cron', { enabled: true });
+      expect(crontab).toContain('dorothy-automation-del-cron');
+
+      // when
+      const result = await invokeHandler('automation:delete', 'del-cron') as { success: boolean };
+
+      // then
+      expect(result.success).toBe(true);
+      expect(crontab).not.toContain('dorothy-automation-del-cron');
+      expect(fs.existsSync(path.join(tmpDir, '.dorothy', 'scripts', 'automation-del-cron.sh'))).toBe(false);
+    });
+
+    it('leaves unrelated crontab lines alone', async () => {
+      // given
+      crontab = '0 3 * * * /usr/local/bin/backup.sh\n30 4 * * * /home/me/cleanup.sh # dorothy-abc123\n';
+      writeTmpJson('.dorothy/automations.json', [stored('keep-1')]);
+      await registerHandlers();
+
+      // when
+      await invokeHandler('automation:update', 'keep-1', { enabled: false });
+      await invokeHandler('automation:update', 'keep-1', { enabled: true });
+      await invokeHandler('automation:delete', 'keep-1');
+
+      // then
+      expect(crontab).toContain('/usr/local/bin/backup.sh');
+      expect(crontab).toContain('# dorothy-abc123');
     });
   });
 
