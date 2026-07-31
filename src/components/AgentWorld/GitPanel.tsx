@@ -220,12 +220,16 @@ export default function GitPanel({ projectPath, className = '', hideHeader = fal
     }
   }, [projectPath, onBranchChange]);
 
-  // Open project in Cursor IDE
+  // Open project in Cursor IDE. shell.exec runs this through a login shell, so the
+  // `cursor` CLI is found wherever the user's profile put it; `open -a` only exists
+  // on macOS and xdg-open is the Linux fallback when the CLI is not installed.
   const handleOpenInCursor = useCallback(async () => {
     if (!projectPath || !window.electronAPI?.shell?.exec) return;
     try {
       await window.electronAPI.shell.exec({
-        command: `open -a "Cursor" "${projectPath}"`,
+        command: `if command -v cursor >/dev/null 2>&1; then cursor "${projectPath}"; `
+          + `elif [ "$(uname)" = "Darwin" ]; then open -a "Cursor" "${projectPath}"; `
+          + `else xdg-open "${projectPath}"; fi`,
       });
     } catch (err) {
       console.error('Failed to open in Cursor:', err);
