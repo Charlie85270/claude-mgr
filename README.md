@@ -561,6 +561,42 @@ Output in `release/`:
 - **macOS**: `release/mac-arm64/Dorothy.app` (Apple Silicon) or `release/mac/Dorothy.app` (Intel)
 - DMG installer included
 
+### Linux (Development)
+
+`scripts/run-linux.sh` takes a fresh checkout to a running app in one command:
+
+```bash
+npm run dev:linux                    # Electron dev mode
+npm run dev:linux -- --web           # Browser-only mode (http://localhost:3000)
+npm run dev:linux -- --skip-install  # Skip the dependency install step
+npm run dev:linux -- --help
+```
+
+The script checks prerequisites, installs dependencies when they are missing or
+stale, rebuilds the native modules against the Electron ABI, and starts
+`npm run electron:dev`. Ctrl-C stops the whole dev stack — no orphaned
+`next`/`electron` processes.
+
+**Requirements** (the script reports the exact `apt` line when something is missing):
+
+- **Node.js 22+** — the version in `.nvmrc`. Not in the Ubuntu/Debian archives, install it via [nvm](https://github.com/nvm-sh/nvm) or [NodeSource](https://github.com/nodesource/distributions).
+- **Build toolchain** — `sudo apt install -y build-essential python3`. `better-sqlite3` and `node-pty` have no prebuilt binaries for the Electron ABI, so they compile from source.
+
+**Notes:**
+
+- The Electron rebuild is slow, so it is cached with a stamp file
+  (`node_modules/.dorothy-electron-rebuild`) and only re-runs when the Electron
+  version or the Node ABI changes.
+- On Ubuntu 24.04+ (`kernel.apparmor_restrict_unprivileged_userns=1`) the kernel
+  blocks unprivileged user namespaces and Electron's sandbox fails to start. The
+  script detects this and exports `ELECTRON_DISABLE_SANDBOX=1`, printing a line
+  explaining what it did. On kernels without the restriction nothing changes.
+- Port 3000 must be free — `next dev` silently falls back to another port and the
+  Electron window would then wait forever for `http://localhost:3000`.
+
+Packaging is macOS-only for now (`electron:build` / `electron:pack` pass `--mac`);
+this script covers development mode.
+
 ### Web Browser (Development)
 
 ```bash
