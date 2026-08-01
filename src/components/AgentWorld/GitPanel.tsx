@@ -228,16 +228,24 @@ export default function GitPanel({ projectPath, className = '', hideHeader = fal
     // Single-quote the path so a directory name containing $(), backticks or a
     // quote cannot break out of the command string.
     const quotedPath = `'${projectPath.replace(/'/g, "'\\''")}'`;
+    // Each branch reports which one ran: xdg-open hands a directory to the
+    // desktop's folder handler and exits 0, so a file manager opening instead of
+    // Cursor would otherwise look exactly like success.
+    const command =
+      `if command -v cursor >/dev/null 2>&1; then cursor ${quotedPath} && echo DOROTHY_OPENED=cursor; `
+      + `elif [ "$(uname)" = "Darwin" ]; then open -a "Cursor" ${quotedPath} && echo DOROTHY_OPENED=open-a; `
+      + `else xdg-open ${quotedPath} && echo DOROTHY_OPENED=xdg-open; fi`;
     try {
-      const result = await window.electronAPI.shell.exec({
-        command: `if command -v cursor >/dev/null 2>&1; then cursor ${quotedPath}; `
-          + `elif [ "$(uname)" = "Darwin" ]; then open -a "Cursor" ${quotedPath}; `
-          + `else xdg-open ${quotedPath}; fi`,
-      });
+      const result = await window.electronAPI.shell.exec({ command });
       // shell.exec resolves with success:false instead of throwing, so the catch
       // below never sees a failed command.
       if (!result?.success) {
         console.error('Failed to open in Cursor:', result?.error);
+      } else if (result.output?.includes('DOROTHY_OPENED=xdg-open')) {
+        console.warn(
+          'Cursor CLI not found — opened the project with xdg-open, which may launch a file manager '
+          + 'rather than Cursor. Install the `cursor` command from Cursor: Shell Command: Install.'
+        );
       }
     } catch (err) {
       console.error('Failed to open in Cursor:', err);
