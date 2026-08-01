@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Build output. Without these, running lint after a packaging build reports
+    // thousands of problems from bundled third-party code.
+    "release/**",
+    "electron/dist/**",
   ]),
 ]);
 
