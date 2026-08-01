@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as os from 'os';
 import { spawn } from 'child_process';
 import { getProvider } from '../providers';
+import { isValidCronExpression } from '../utils/cron-parser';
 import type { AgentProvider } from '../types';
 
 // ============================================
@@ -245,10 +246,16 @@ async function writeAutomationScript(automation: Automation): Promise<{
   const claudePath = await getCLIPath(automationProvider);
   const claudeDir = path.dirname(claudePath);
 
-  // Convert schedule to cron
+  // Convert schedule to cron. The expression can come from the MCP
+  // create_automation tool or straight out of automations.json, neither of which
+  // constrains it, and it ends up in the user's crontab verbatim — so reject
+  // anything that is not a plain 5-field expression before going any further.
   let cronSchedule: string;
   if (automation.schedule.type === 'cron' && automation.schedule.cron) {
-    cronSchedule = automation.schedule.cron;
+    if (!isValidCronExpression(automation.schedule.cron)) {
+      throw new Error(`Invalid cron expression: ${JSON.stringify(automation.schedule.cron)}`);
+    }
+    cronSchedule = automation.schedule.cron.trim().split(/\s+/).join(' ');
   } else {
     cronSchedule = intervalToCron(automation.schedule.intervalMinutes || 60);
   }

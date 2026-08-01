@@ -163,3 +163,38 @@ export function parseCronToPreset(cron: string): ParsedCron {
 
   return result;
 }
+
+/**
+ * Whether a string is a safe 5-field cron expression.
+ *
+ * Automation and task schedules reach the crontab from MCP tools and stored
+ * JSON, neither of which constrains the value. A newline would append arbitrary
+ * extra crontab lines, and a malformed expression makes `crontab -` reject the
+ * whole file, so both are rejected before anything is written.
+ */
+export function isValidCronExpression(expr: string): boolean {
+  if (typeof expr !== 'string') return false;
+  // % has a special meaning to cron (it terminates the command and feeds the
+  // rest to stdin); \n and \r would inject whole lines.
+  if (/[\n\r%]/.test(expr)) return false;
+
+  const fields = expr.trim().split(/\s+/);
+  if (fields.length !== 5) return false;
+
+  const ranges: Array<[number, number]> = [[0, 59], [0, 23], [1, 31], [1, 12], [0, 7]];
+  return fields.every((field, i) => {
+    const [min, max] = ranges[i];
+    return field.split(',').every(part => {
+      const [range, step] = part.split('/');
+      if (step !== undefined && !/^[1-9]\d*$/.test(step)) return false;
+      if (range === '*') return true;
+      const bounds = range.split('-');
+      if (bounds.length > 2) return false;
+      return bounds.every(bound => {
+        if (!/^\d+$/.test(bound)) return false;
+        const value = parseInt(bound, 10);
+        return value >= min && value <= max;
+      });
+    });
+  });
+}
