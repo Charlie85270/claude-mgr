@@ -1,0 +1,106 @@
+name: Build - Linux
+
+# Adapted from davebulaval's Linux packaging workflow in #44, widened from deb
+# to all four targets this branch produces.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux:
+    name: Build Linux (Ubuntu)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Linux build dependencies
+        # libarchive-tools provides bsdtar, which electron-builder uses to unpack
+        # the Electron dist; rpm is required for the rpm target.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libarchive-tools rpm
+
+      - name: Build Linux packages
+        run: npm run electron:build:linux
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify artifacts
+        run: |
+          shopt -s nullglob
+          fail=0
+
+          for kind in AppImage deb rpm tar.gz; do
+            files=(release/*."$kind")
+            if [ ${#files[@]} -eq 0 ]; then
+              echo "ERROR: no .$kind produced"
+              fail=1
+              continue
+            fi
+            for f in "${files[@]}"; do
+              size=$(stat --format=%s "$f")
+              echo "$kind: $f ($size bytes)"
+              # A truncated or empty package is the failure mode worth catching;
+              # a real build is >50MB because Electron is bundled.
+              if [ "$size" -lt 52428800 ]; then
+                echo "ERROR: $f is only $size bytes — expected >50MB"
+                fail=1
+              fi
+            done
+          done
+
+          for deb in release/*.deb; do
+            echo "=== $deb metadata ==="
+            dpkg-deb --info "$deb"
+            entry=$(dpkg-deb --contents "$deb" | grep -m1 'opt/Dorothy/dorothy$' || true)
+            if [ -z "$entry" ]; then
+              echo "ERROR: dorothy binary missing from $deb"
+              fail=1
+            elif [ "$(awk '{print $3}' <<<"$entry")" -eq 0 ]; then
+              echo "ERROR: dorothy binary in $deb is zero-size"
+              fail=1
+            fi
+          done
+
+          exit "$fail"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Dorothy-Linux-x64
+          path: |
+            release/*.AppImage
+            release/*.deb
+            release/*.rpm
+            release/*.tar.gz
+          if-no-files-found: error
+
+      - name: Upload to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/*.AppImage
+            release/*.deb
+            release/*.rpm
+            release/*.tar.gz
+            release/latest-linux.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
