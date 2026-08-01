@@ -15,6 +15,19 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 
+// Launched from a .desktop entry there is no TTY behind stdout/stderr, so any
+// log write can fail with EPIPE and take the app down. Ignore just that; other
+// stream errors still surface as before.
+// Adapted from davebulaval's Linux packaging work in #44.
+if (process.platform === 'linux') {
+  const ignoreEpipe = (err: NodeJS.ErrnoException) => {
+    if (err.code === 'EPIPE') return;
+    throw err;
+  };
+  process.stdout.on('error', ignoreEpipe);
+  process.stderr.on('error', ignoreEpipe);
+}
+
 // Types
 import type { AppSettings, AgentStatus } from './types';
 
