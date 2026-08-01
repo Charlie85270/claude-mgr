@@ -2061,21 +2061,36 @@ function registerShellHandlers(deps: IpcHandlerDependencies): void {
         : `cd '${escapedCwd}'; exec ${shell} -l`;
       const args = [...terminal.cwdArgs(cwd), ...terminal.execArgs(shell, payload)];
 
-      try {
-        const { spawn } = await import('child_process');
-        const child = spawn(terminal.binPath as string, args, {
-          cwd,
-          detached: true,
-          stdio: 'ignore',
-          env: process.env,
-        });
-        child.unref();
-      } catch (err) {
-        return { success: false, error: `Failed to launch ${terminal.bin}: ${String(err)}` };
-      }
+      const { spawn } = await import('child_process');
 
-      // The emulator outlives this call, so report success once it is launched.
-      return { success: true };
+      // spawn() reports failure asynchronously through an 'error' event, not by
+      // throwing — an unhandled one takes down the whole main process. Wait for
+      // either 'spawn' or 'error' so a deleted cwd or a missing binary comes back
+      // as a result instead of a crash.
+      return await new Promise<{ success: boolean; error?: string }>((resolve) => {
+        let child: import('child_process').ChildProcess;
+        try {
+          child = spawn(terminal.binPath as string, args, {
+            cwd,
+            detached: true,
+            stdio: 'ignore',
+            env: process.env,
+          });
+        } catch (err) {
+          resolve({ success: false, error: `Failed to launch ${terminal.bin}: ${String(err)}` });
+          return;
+        }
+
+        child.once('error', (err) => {
+          resolve({ success: false, error: `Failed to launch ${terminal.bin}: ${err.message}` });
+        });
+
+        // The emulator outlives this call, so report success once it is launched.
+        child.once('spawn', () => {
+          child.unref();
+          resolve({ success: true });
+        });
+      });
     }
 
     const script = command
