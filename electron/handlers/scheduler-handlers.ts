@@ -6,6 +6,8 @@ import { spawn } from 'child_process';
 import { v4 as uuidv4 } from 'uuid';
 import { getMainWindow } from '../core/window-manager';
 import { getProvider } from '../providers';
+import { isValidCronExpression } from '../utils/cron-parser';
+import { readCrontab, writeCrontab, withoutMarkedLines, joinLines, markedLine } from '../utils/crontab';
 import type { AgentProvider, AgentStatus, AppSettings } from '../types';
 
 // ============================================
@@ -427,6 +429,10 @@ ${calendarIntervalXml}
   });
 }
 
+function schedulerCronMarker(taskId: string): string {
+  return `dorothy-${taskId}`;
+}
+
 // Create cron job (Linux)
 async function createCronJob(
   taskId: string,
@@ -436,6 +442,12 @@ async function createCronJob(
   autonomous: boolean,
   provider: AgentProvider = 'claude'
 ): Promise<void> {
+  // The schedule comes from schedules.json or an MCP tool, neither of which
+  // constrains it, and it is written into the user's crontab verbatim.
+  if (!isValidCronExpression(schedule)) {
+    throw new Error(`Invalid cron expression: ${JSON.stringify(schedule)}`);
+  }
+
   const claudePath = await getCLIPath(provider);
   const claudeDir = path.dirname(claudePath);
 
@@ -473,34 +485,11 @@ async function createCronJob(
   fs.writeFileSync(scriptPath, scriptContent);
   fs.chmodSync(scriptPath, '755');
 
-  const cronLine = `${schedule} ${scriptPath} # dorothy-${taskId}`;
+  const marker = schedulerCronMarker(taskId);
+  const lines = withoutMarkedLines(await readCrontab(), marker);
+  lines.push(markedLine(schedule, scriptPath, marker));
 
-  await new Promise<void>((resolve, reject) => {
-    const getCron = spawn('crontab', ['-l']);
-    let existingCron = '';
-    getCron.stdout.on('data', (data) => { existingCron += data; });
-    getCron.on('close', () => {
-      const newCron = existingCron + '\n' + cronLine + '\n';
-      const setCron = spawn('crontab', ['-']);
-      setCron.stdin.write(newCron);
-      setCron.stdin.end();
-      setCron.on('close', (code) => {
-        if (code === 0) resolve();
-        else reject(new Error(`crontab failed with code ${code}`));
-      });
-      setCron.on('error', reject);
-    });
-    getCron.on('error', () => {
-      const setCron = spawn('crontab', ['-']);
-      setCron.stdin.write(cronLine + '\n');
-      setCron.stdin.end();
-      setCron.on('close', (code) => {
-        if (code === 0) resolve();
-        else reject(new Error(`crontab failed with code ${code}`));
-      });
-      setCron.on('error', reject);
-    });
-  });
+  await writeCrontab(joinLines(lines));
 }
 
 /**
@@ -931,24 +920,12 @@ export function registerSchedulerHandlers(deps: SchedulerDeps): void {
         }
       } else {
         // Remove from crontab (Linux)
-        await new Promise<void>((resolve) => {
-          const getCron = spawn('crontab', ['-l']);
-          let existingCron = '';
-          getCron.stdout.on('data', (data) => { existingCron += data; });
-          getCron.on('close', () => {
-            const newCron = existingCron
-              .split('\n')
-              .filter(line => !line.includes(`dorothy-${taskId}`))
-              .join('\n');
-
-            const setCron = spawn('crontab', ['-']);
-            setCron.stdin.write(newCron);
-            setCron.stdin.end();
-            setCron.on('close', () => resolve());
-            setCron.on('error', () => resolve());
-          });
-          getCron.on('error', () => resolve());
-        });
+        try {
+          const existing = await readCrontab();
+          await writeCrontab(joinLines(withoutMarkedLines(existing, schedulerCronMarker(taskId))));
+        } catch (err) {
+          console.error('Failed to remove cron entry:', err);
+        }
       }
 
       // Remove script file
@@ -1079,24 +1056,14 @@ export function registerSchedulerHandlers(deps: SchedulerDeps): void {
           // Create new launchd job with updated schedule
           await createLaunchdJob(taskId, schedule, projectPath, prompt, autonomous, taskProvider);
         } else {
-          // Remove old cron entry
-          await new Promise<void>((resolve) => {
-            const getCron = spawn('crontab', ['-l']);
-            let existingCron = '';
-            getCron.stdout.on('data', (data: Buffer) => { existingCron += data; });
-            getCron.on('close', () => {
-              const newCron = existingCron
-                .split('\n')
-                .filter(line => !line.includes(`dorothy-${taskId}`))
-                .join('\n');
-              const setCron = spawn('crontab', ['-']);
-              setCron.stdin.write(newCron);
-              setCron.stdin.end();
-              setCron.on('close', () => resolve());
-              setCron.on('error', () => resolve());
-            });
-            getCron.on('error', () => resolve());
-          });
+          // Remove old cron entry — createCronJob re-adds it below, and it also
+          // replaces any line already carrying this marker.
+          try {
+            const existing = await readCrontab();
+            await writeCrontab(joinLines(withoutMarkedLines(existing, schedulerCronMarker(taskId))));
+          } catch (err) {
+            console.error('Failed to remove old cron entry:', err);
+          }
 
           // Create new cron job
           await createCronJob(taskId, schedule, projectPath, prompt, autonomous, taskProvider);
