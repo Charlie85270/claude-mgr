@@ -5,6 +5,7 @@ import * as os from 'os';
 import { spawn } from 'child_process';
 import { getProvider } from '../providers';
 import { isValidCronExpression } from '../utils/cron-parser';
+import { readCrontab, writeCrontab, withoutMarkedLines, hasMarkedLine, joinLines, markedLine } from '../utils/crontab';
 import type { AgentProvider } from '../types';
 
 // ============================================
@@ -224,13 +225,24 @@ async function getClaudePath(): Promise<string> {
   return getCLIPath('claude');
 }
 
+// The id becomes part of a filename and of a crontab line, and automations.json
+// and the MCP tools do not constrain it — so anything outside this set could
+// inject a second crontab line or escape the scripts directory.
+function assertSafeAutomationId(automationId: string): void {
+  if (!/^[A-Za-z0-9_-]{1,64}$/.test(automationId)) {
+    throw new Error(`Invalid automation id: ${JSON.stringify(automationId)}`);
+  }
+}
+
 function automationScriptPath(automationId: string): string {
+  assertSafeAutomationId(automationId);
   return path.join(os.homedir(), '.dorothy', 'scripts', `automation-${automationId}.sh`);
 }
 
 // Marker appended to the crontab line so it can be found again on disable/delete.
 // Distinct from the scheduler's `dorothy-<taskId>` so neither can match the other.
 function automationCronMarker(automationId: string): string {
+  assertSafeAutomationId(automationId);
   return `dorothy-automation-${automationId}`;
 }
 
@@ -371,7 +383,6 @@ ${scheduleXml}
 async function removeAutomationLaunchdJob(automationId: string): Promise<void> {
   const label = `com.dorothy.automation.${automationId}`;
   const plistPath = path.join(os.homedir(), 'Library', 'LaunchAgents', `${label}.plist`);
-  const scriptPath = automationScriptPath(automationId);
 
   // Unload from launchd
   const uid = process.getuid?.() || 501;
@@ -385,44 +396,6 @@ async function removeAutomationLaunchdJob(automationId: string): Promise<void> {
   if (fs.existsSync(plistPath)) {
     fs.unlinkSync(plistPath);
   }
-
-  // Remove script file
-  if (fs.existsSync(scriptPath)) {
-    fs.unlinkSync(scriptPath);
-  }
-}
-
-// Read the current crontab. An empty crontab and a missing `crontab` binary both
-// read as empty, matching how the scheduler treats them.
-function readCrontab(): Promise<string> {
-  return new Promise((resolve) => {
-    const proc = spawn('crontab', ['-l']);
-    let output = '';
-    proc.stdout.on('data', (data) => { output += data; });
-    proc.on('close', () => resolve(output));
-    proc.on('error', () => resolve(''));
-  });
-}
-
-function writeCrontab(content: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const proc = spawn('crontab', ['-']);
-    proc.stdin.write(content);
-    proc.stdin.end();
-    proc.on('close', (code) => {
-      if (code === 0) resolve();
-      else reject(new Error(`crontab failed with code ${code}`));
-    });
-    proc.on('error', reject);
-  });
-}
-
-function withoutMarker(crontab: string, marker: string): string[] {
-  const lines = crontab.split('\n').filter(line => !line.includes(marker));
-  while (lines.length > 0 && lines[lines.length - 1].trim() === '') {
-    lines.pop();
-  }
-  return lines;
 }
 
 // Create cron job for automation (Linux)
@@ -430,22 +403,26 @@ async function createAutomationCronJob(automation: Automation): Promise<void> {
   const { scriptPath, cronSchedule } = await writeAutomationScript(automation);
   const marker = automationCronMarker(automation.id);
 
-  const lines = withoutMarker(await readCrontab(), marker);
-  lines.push(`${cronSchedule} ${scriptPath} # ${marker}`);
+  const lines = withoutMarkedLines(await readCrontab(), marker);
+  lines.push(markedLine(cronSchedule, scriptPath, marker));
 
-  await writeCrontab(lines.join('\n') + '\n');
+  await writeCrontab(joinLines(lines));
 }
 
-// Remove cron job for automation (Linux)
+// Remove cron job for automation (Linux).
+// The runner script is deliberately left in place: `automation:run` executes it,
+// so a disabled automation must still be runnable by hand. Only deleting the
+// automation removes it.
 async function removeAutomationCronJob(automationId: string): Promise<void> {
   const marker = automationCronMarker(automationId);
   const existing = await readCrontab();
 
-  if (existing.includes(marker)) {
-    const lines = withoutMarker(existing, marker);
-    await writeCrontab(lines.length > 0 ? lines.join('\n') + '\n' : '');
+  if (hasMarkedLine(existing, marker)) {
+    await writeCrontab(joinLines(withoutMarkedLines(existing, marker)));
   }
+}
 
+function deleteAutomationScript(automationId: string): void {
   const scriptPath = automationScriptPath(automationId);
   if (fs.existsSync(scriptPath)) {
     fs.unlinkSync(scriptPath);
@@ -562,11 +539,13 @@ export function registerAutomationHandlers(): void {
         outputs,
       };
 
+      // Register the job before persisting: if the schedule is rejected or the
+      // crontab write fails, nothing is stored, so the UI never shows an enabled
+      // automation that has no job behind it.
+      await registerAutomationJob(newAutomation);
+
       automations.push(newAutomation);
       saveAutomations(automations);
-
-      // Register the scheduled job (launchd on macOS, crontab elsewhere)
-      await registerAutomationJob(newAutomation);
 
       return { success: true, automationId: newAutomation.id };
     } catch (err) {
@@ -589,6 +568,16 @@ export function registerAutomationHandlers(): void {
 
       const wasEnabled = automations[index].enabled;
 
+      // Apply the job change first — persisting an enabled flag whose job failed
+      // to register would leave the two permanently disagreeing.
+      if (params.enabled !== undefined && params.enabled !== wasEnabled) {
+        if (params.enabled) {
+          await registerAutomationJob({ ...automations[index], enabled: true });
+        } else {
+          await unregisterAutomationJob(id);
+        }
+      }
+
       if (params.enabled !== undefined) {
         automations[index].enabled = params.enabled;
       }
@@ -598,15 +587,6 @@ export function registerAutomationHandlers(): void {
       automations[index].updatedAt = new Date().toISOString();
 
       saveAutomations(automations);
-
-      // Handle enable/disable of the scheduled job
-      if (params.enabled !== undefined && params.enabled !== wasEnabled) {
-        if (params.enabled) {
-          await registerAutomationJob(automations[index]);
-        } else {
-          await unregisterAutomationJob(id);
-        }
-      }
 
       return { success: true };
     } catch (err) {
@@ -629,6 +609,7 @@ export function registerAutomationHandlers(): void {
 
       // Remove the scheduled job (launchd on macOS, crontab elsewhere)
       await unregisterAutomationJob(id);
+      deleteAutomationScript(id);
 
       return { success: true };
     } catch (err) {
