@@ -22,6 +22,7 @@ import { writeProgrammaticInput } from '../core/pty-manager';
 import { extractStatusLine } from '../utils/ansi';
 import { scheduleTick } from '../utils/agents-tick';
 import { resolveShell } from '../utils/resolve-shell';
+import { spawn } from 'child_process';
 
 /**
  * Normalize a JIRA domain value to a full hostname.
@@ -2033,6 +2034,84 @@ function findExecutable(name: string): string | null {
   return null;
 }
 
+/**
+ * An AppImage's AppRun points these at its own mount, and a child that inherits
+ * them loads the bundled glibc/Qt — which breaks the child outright, and breaks
+ * it again the moment the AppImage exits and the mount disappears. AppRun saves
+ * the originals as <VAR>_ORIG, so restore those and drop the rest.
+ */
+function environmentForDetachedChild(): NodeJS.ProcessEnv {
+  const env: NodeJS.ProcessEnv = { ...process.env };
+  if (!env.APPDIR) return env;
+
+  const leaked = [
+    'LD_LIBRARY_PATH', 'LD_PRELOAD', 'PYTHONPATH', 'PYTHONHOME', 'PERLLIB',
+    'GSETTINGS_SCHEMA_DIR', 'QT_PLUGIN_PATH', 'XDG_DATA_DIRS', 'GI_TYPELIB_PATH',
+    'GDK_PIXBUF_MODULE_FILE',
+  ];
+  for (const key of leaked) {
+    const original = env[`${key}_ORIG`];
+    if (original !== undefined) env[key] = original;
+    else delete env[key];
+    delete env[`${key}_ORIG`];
+  }
+  delete env.APPDIR;
+  delete env.APPIMAGE;
+  delete env.ARGV0;
+  delete env.OWD;
+  return env;
+}
+
+/**
+ * Launch one emulator and decide whether it actually took the job.
+ *
+ * 'spawn' only means the binary was exec'd — an emulator that rejects the
+ * argument form execs fine and then exits non-zero, which would otherwise look
+ * like success. Exiting 0 straight away is normal for the client/server ones
+ * (they hand off to a running server), so only a non-zero exit counts as
+ * failure; anything still alive after the grace period is working.
+ */
+function launchTerminal(
+  binPath: string,
+  bin: string,
+  args: string[],
+  cwd: string,
+): Promise<{ success: true } | { success: false; error: string }> {
+  return new Promise((resolve) => {
+    let settled = false;
+    const settle = (result: { success: true } | { success: false; error: string }) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(grace);
+      resolve(result);
+    };
+
+    let child: import('child_process').ChildProcess;
+    try {
+      child = spawn(binPath, args, {
+        cwd,
+        detached: true,
+        stdio: 'ignore',
+        env: environmentForDetachedChild(),
+      });
+    } catch (err) {
+      resolve({ success: false, error: `${bin}: ${String(err)}` });
+      return;
+    }
+
+    const grace = setTimeout(() => {
+      child.unref();
+      settle({ success: true });
+    }, 400);
+
+    child.once('error', (err) => settle({ success: false, error: `${bin}: ${err.message}` }));
+    child.once('exit', (code) => {
+      if (code === 0) settle({ success: true });
+      else settle({ success: false, error: `${bin} exited with code ${code}` });
+    });
+  });
+}
+
 function registerShellHandlers(deps: IpcHandlerDependencies): void {
   const { quickPtyProcesses, getMainWindow } = deps;
 
@@ -2042,16 +2121,6 @@ function registerShellHandlers(deps: IpcHandlerDependencies): void {
     const escapedCwd = cwd.replace(/'/g, "'\\''");
 
     if (os.platform() !== 'darwin') {
-      const terminal = LINUX_TERMINALS.map(t => ({ ...t, binPath: findExecutable(t.bin) }))
-        .find(t => t.binPath !== null);
-
-      if (!terminal) {
-        return {
-          success: false,
-          error: `No terminal emulator found. Install one of: ${LINUX_TERMINALS.map(t => t.bin).join(', ')}.`,
-        };
-      }
-
       // The cwd goes through the payload as well as the emulator's own flag: a
       // client/server emulator opens the window from the server's directory, not
       // from this process's. The trailing exec keeps the window open afterwards,
@@ -2059,38 +2128,30 @@ function registerShellHandlers(deps: IpcHandlerDependencies): void {
       const payload = command
         ? `cd '${escapedCwd}' && ${command}; exec ${shell} -l`
         : `cd '${escapedCwd}'; exec ${shell} -l`;
-      const args = [...terminal.cwdArgs(cwd), ...terminal.execArgs(shell, payload)];
 
-      const { spawn } = await import('child_process');
+      const failures: string[] = [];
+      let found = false;
 
-      // spawn() reports failure asynchronously through an 'error' event, not by
-      // throwing — an unhandled one takes down the whole main process. Wait for
-      // either 'spawn' or 'error' so a deleted cwd or a missing binary comes back
-      // as a result instead of a crash.
-      return await new Promise<{ success: boolean; error?: string }>((resolve) => {
-        let child: import('child_process').ChildProcess;
-        try {
-          child = spawn(terminal.binPath as string, args, {
-            cwd,
-            detached: true,
-            stdio: 'ignore',
-            env: process.env,
-          });
-        } catch (err) {
-          resolve({ success: false, error: `Failed to launch ${terminal.bin}: ${String(err)}` });
-          return;
-        }
+      for (const terminal of LINUX_TERMINALS) {
+        const binPath = findExecutable(terminal.bin);
+        if (!binPath) continue;
+        found = true;
 
-        child.once('error', (err) => {
-          resolve({ success: false, error: `Failed to launch ${terminal.bin}: ${err.message}` });
-        });
+        const args = [...terminal.cwdArgs(cwd), ...terminal.execArgs(shell, payload)];
+        const result = await launchTerminal(binPath, terminal.bin, args, cwd);
+        if (result.success) return { success: true };
 
-        // The emulator outlives this call, so report success once it is launched.
-        child.once('spawn', () => {
-          child.unref();
-          resolve({ success: true });
-        });
-      });
+        // This one is installed but would not take the job — try the next.
+        failures.push(result.error);
+      }
+
+      if (!found) {
+        return {
+          success: false,
+          error: `No terminal emulator found. Install one of: ${LINUX_TERMINALS.map(t => t.bin).join(', ')}.`,
+        };
+      }
+      return { success: false, error: `Could not open a terminal. Tried: ${failures.join('; ')}` };
     }
 
     const script = command
