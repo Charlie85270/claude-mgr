@@ -553,7 +553,7 @@ export interface ElectronAPI {
 
   // Shell operations
   shell: {
-    openTerminal: (params: { cwd: string; command?: string }) => Promise<{ success: boolean }>;
+    openTerminal: (params: { cwd: string; command?: string }) => Promise<{ success: boolean; error?: string }>;
     exec: (params: { command: string; cwd?: string }) => Promise<{ success: boolean; output?: string; error?: string; code?: number }>;
     // Quick terminal PTY
     startPty?: (params: { cwd?: string; cols?: number; rows?: number }) => Promise<string>;

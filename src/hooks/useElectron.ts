@@ -325,7 +325,13 @@ export function useElectronShell() {
     if (!isElectron()) {
       throw new Error('Electron API not available');
     }
-    return window.electronAPI!.shell.openTerminal({ cwd, command });
+    const result = await window.electronAPI!.shell.openTerminal({ cwd, command });
+    // The main process explains what it tried and what to install; without this
+    // the button would just do nothing on a machine with no terminal emulator.
+    if (!result?.success) {
+      console.error('Failed to open a terminal:', result?.error);
+    }
+    return result;
   }, []);
 
   const exec = useCallback(async (command: string, cwd?: string) => {
