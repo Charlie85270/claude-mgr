@@ -164,37 +164,77 @@ export function parseCronToPreset(cron: string): ParsedCron {
   return result;
 }
 
+const MONTH_NAMES = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+const DAY_NAMES = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
+const CRON_MACROS = new Set([
+  '@yearly', '@annually', '@monthly', '@weekly', '@daily', '@midnight', '@hourly', '@reboot',
+]);
+
+interface CronFieldSpec {
+  min: number;
+  max: number;
+  names?: string[];
+  nameBase?: number;
+}
+
+const CRON_FIELDS: CronFieldSpec[] = [
+  { min: 0, max: 59 },
+  { min: 0, max: 23 },
+  { min: 1, max: 31 },
+  { min: 1, max: 12, names: MONTH_NAMES, nameBase: 1 },
+  { min: 0, max: 7, names: DAY_NAMES, nameBase: 0 },
+];
+
+function cronToken(token: string, spec: CronFieldSpec): number | null {
+  if (spec.names) {
+    const named = spec.names.indexOf(token.toLowerCase());
+    if (named !== -1) return named + (spec.nameBase ?? 0);
+  }
+  if (!/^\d+$/.test(token)) return null;
+  const value = Number(token);
+  return value >= spec.min && value <= spec.max ? value : null;
+}
+
+function isValidCronField(field: string, spec: CronFieldSpec): boolean {
+  if (field === '') return false;
+
+  return field.split(',').every(part => {
+    const [rangePart, ...steps] = part.split('/');
+
+    // Every step must be a positive number, and a step only qualifies '*' or a
+    // range — cron accepts "1-10/2" and "*/2" but rejects "5/10".
+    if (steps.length > 0) {
+      if (!steps.every(step => /^[1-9]\d*$/.test(step))) return false;
+      if (rangePart !== '*' && !rangePart.includes('-')) return false;
+    }
+
+    if (rangePart === '*') return true;
+    return rangePart.split('-').every(bound => cronToken(bound, spec) !== null);
+  });
+}
+
 /**
- * Whether a string is a safe 5-field cron expression.
+ * Whether a string is a cron schedule that is safe to write to a crontab.
  *
  * Automation and task schedules reach the crontab from MCP tools and stored
  * JSON, neither of which constrains the value. A newline would append arbitrary
- * extra crontab lines, and a malformed expression makes `crontab -` reject the
- * whole file, so both are rejected before anything is written.
+ * extra crontab lines and '%' terminates the command, so both are rejected —
+ * and so is anything `crontab -` itself would refuse, since a rejected file
+ * leaves the schedule saved with no job behind it.
+ *
+ * Named months and weekdays (JAN-DEC, SUN-SAT) and the @-macros are ordinary
+ * cron syntax and are accepted.
  */
 export function isValidCronExpression(expr: string): boolean {
   if (typeof expr !== 'string') return false;
-  // % has a special meaning to cron (it terminates the command and feeds the
-  // rest to stdin); \n and \r would inject whole lines.
   if (/[\n\r%]/.test(expr)) return false;
 
-  const fields = expr.trim().split(/\s+/);
-  if (fields.length !== 5) return false;
+  const trimmed = expr.trim();
+  if (CRON_MACROS.has(trimmed.toLowerCase())) return true;
 
-  const ranges: Array<[number, number]> = [[0, 59], [0, 23], [1, 31], [1, 12], [0, 7]];
-  return fields.every((field, i) => {
-    const [min, max] = ranges[i];
-    return field.split(',').every(part => {
-      const [range, step] = part.split('/');
-      if (step !== undefined && !/^[1-9]\d*$/.test(step)) return false;
-      if (range === '*') return true;
-      const bounds = range.split('-');
-      if (bounds.length > 2) return false;
-      return bounds.every(bound => {
-        if (!/^\d+$/.test(bound)) return false;
-        const value = parseInt(bound, 10);
-        return value >= min && value <= max;
-      });
-    });
-  });
+  const fields = trimmed.split(/\s+/);
+  if (fields.length !== CRON_FIELDS.length) return false;
+
+  return fields.every((field, i) => isValidCronField(field, CRON_FIELDS[i]));
 }
