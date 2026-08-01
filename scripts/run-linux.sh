@@ -139,7 +139,13 @@ check_prerequisites() {
 check_port_free() {
   local busy=0
   if command -v ss >/dev/null 2>&1; then
-    if ss -ltnH 2>/dev/null | awk '{print $4}' | grep -qE "[:.]${DEV_PORT}$"; then
+    # Piping into "grep -q" makes grep exit on the first hit, which kills awk
+    # with SIGPIPE (141); under "set -o pipefail" that becomes the pipeline's
+    # status and a busy port gets reported as free. Capture first, then match
+    # without a pipe. (ss | awk is safe — awk consumes all of its input.)
+    local listening
+    listening=$(ss -ltnH 2>/dev/null | awk '{print $4}' || true)
+    if grep -qE "[:.]${DEV_PORT}$" <<<"$listening"; then
       busy=1
     fi
   elif command -v lsof >/dev/null 2>&1; then
