@@ -225,12 +225,20 @@ export default function GitPanel({ projectPath, className = '', hideHeader = fal
   // on macOS and xdg-open is the Linux fallback when the CLI is not installed.
   const handleOpenInCursor = useCallback(async () => {
     if (!projectPath || !window.electronAPI?.shell?.exec) return;
+    // Single-quote the path so a directory name containing $(), backticks or a
+    // quote cannot break out of the command string.
+    const quotedPath = `'${projectPath.replace(/'/g, "'\\''")}'`;
     try {
-      await window.electronAPI.shell.exec({
-        command: `if command -v cursor >/dev/null 2>&1; then cursor "${projectPath}"; `
-          + `elif [ "$(uname)" = "Darwin" ]; then open -a "Cursor" "${projectPath}"; `
-          + `else xdg-open "${projectPath}"; fi`,
+      const result = await window.electronAPI.shell.exec({
+        command: `if command -v cursor >/dev/null 2>&1; then cursor ${quotedPath}; `
+          + `elif [ "$(uname)" = "Darwin" ]; then open -a "Cursor" ${quotedPath}; `
+          + `else xdg-open ${quotedPath}; fi`,
       });
+      // shell.exec resolves with success:false instead of throwing, so the catch
+      // below never sees a failed command.
+      if (!result?.success) {
+        console.error('Failed to open in Cursor:', result?.error);
+      }
     } catch (err) {
       console.error('Failed to open in Cursor:', err);
     }
