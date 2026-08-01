@@ -5,6 +5,7 @@ import * as os from 'os';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import type { AppSettings, CLIPaths } from '../types';
+import { resolveShell } from '../utils/resolve-shell';
 
 const execAsync = promisify(exec);
 
@@ -39,7 +40,7 @@ async function detectCLIPaths(savedPaths?: Partial<CLIPaths>): Promise<{ claude:
   // Try to get the full interactive shell PATH (includes .zshrc/.bashrc paths)
   let shellPath = process.env.PATH || '';
   try {
-    const shell = process.env.SHELL || '/bin/zsh';
+    const shell = resolveShell();
     const { stdout } = await execAsync(`${shell} -ilc 'echo $PATH'`, { timeout: 5000 });
     if (stdout.trim()) {
       shellPath = stdout.trim();

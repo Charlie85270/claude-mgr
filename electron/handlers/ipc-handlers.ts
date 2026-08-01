@@ -21,6 +21,7 @@ import { getProvider, getAllProviders } from '../providers';
 import { writeProgrammaticInput } from '../core/pty-manager';
 import { extractStatusLine } from '../utils/ansi';
 import { scheduleTick } from '../utils/agents-tick';
+import { resolveShell } from '../utils/resolve-shell';
 
 /**
  * Normalize a JIRA domain value to a full hostname.
@@ -133,7 +134,7 @@ function registerPtyHandlers(deps: IpcHandlerDependencies): void {
   // Create a new PTY terminal
   ipcMain.handle('pty:create', async (_event, { cwd, cols, rows }: { cwd?: string; cols?: number; rows?: number }) => {
     const id = uuidv4();
-    const shell = process.env.SHELL || '/bin/zsh';
+    const shell = resolveShell();
 
     const ptyProcess = pty.spawn(shell, ['-l'], {
       name: 'xterm-256color',
@@ -1119,7 +1120,7 @@ function registerPluginHandlers(deps: IpcHandlerDependencies): void {
   // contain broken completions like compdef from other tools)
   ipcMain.handle('plugin:install-start', async (_event, { command, cols, rows }: { command: string; cols?: number; rows?: number }) => {
     const id = uuidv4();
-    const shell = process.env.SHELL || '/bin/zsh';
+    const shell = resolveShell();
 
     // If the command starts with /, it's a Claude CLI slash command - prefix with 'claude'
     const finalCommand = command.startsWith('/') ? `claude "${command}"` : command;
@@ -2037,7 +2038,7 @@ function registerShellHandlers(deps: IpcHandlerDependencies): void {
 
   // Open in external terminal
   ipcMain.handle('shell:open-terminal', async (_event, { cwd, command }: { cwd: string; command?: string }) => {
-    const shell = process.env.SHELL || (os.platform() === 'darwin' ? '/bin/zsh' : '/bin/bash');
+    const shell = resolveShell();
     const escapedCwd = cwd.replace(/'/g, "'\\''");
 
     if (os.platform() !== 'darwin') {
@@ -2099,7 +2100,7 @@ function registerShellHandlers(deps: IpcHandlerDependencies): void {
   // Execute arbitrary command (uses PTY)
   ipcMain.handle('shell:exec', async (_event, { command, cwd }: { command: string; cwd?: string }) => {
     return new Promise((resolve) => {
-      const shell = process.env.SHELL || '/bin/zsh';
+      const shell = resolveShell();
       const ptyProcess = pty.spawn(shell, ['-l', '-c', command], {
         name: 'xterm-256color',
         cols: 80,
@@ -2127,7 +2128,7 @@ function registerShellHandlers(deps: IpcHandlerDependencies): void {
   // Start a new quick terminal PTY
   ipcMain.handle('shell:startPty', async (_event, { cwd, cols, rows }: { cwd?: string; cols?: number; rows?: number }) => {
     const id = uuidv4();
-    const shell = process.env.SHELL || '/bin/zsh';
+    const shell = resolveShell();
 
     const ptyProcess = pty.spawn(shell, ['-l'], {
       name: 'xterm-256color',
