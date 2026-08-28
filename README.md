@@ -1,6 +1,11 @@
 # Echelon
 
-A [Titan's Rift](https://titansrift.com/) creation. A desktop app for orchestrating AI agent teams. Deploy themed squads of specialized agents, coordinate them through review gates and a multi-model counselor, and manage everything from one interface.
+`Echelon · fork of Charlie85270/Dorothy · jediswimmer`
+
+> [!NOTE]
+> Fork of [Dorothy](https://github.com/Charlie85270/Dorothy) by Charlie85270. Not a Titans Rift product. This clone is 1 commit ahead and far behind upstream. Follow Dorothy unless a commit here documents a delta.
+
+Desktop app for orchestrating AI agent teams. The jediswimmer delta in this tree is the factor-echelon team-factory overlay.
 
 ## What Echelon Adds
 
@@ -107,7 +112,7 @@ bun run skill:build      # Build skill pipeline
 
 ## Upstream
 
-Echelon is a fork of [Dorothy](https://github.com/Charlie85270/Dorothy) by [Charlie85270](https://github.com/Charlie85270), extended by [Titan's Rift](https://titansrift.com/). The upstream remote tracks the original repo for pulling in new features and fixes.
+Echelon is a fork of [Dorothy](https://github.com/Charlie85270/Dorothy) by [Charlie85270](https://github.com/Charlie85270). Pull upstream for Dorothy features. This GitHub is `jediswimmer/Echelon`. Not a Titans Rift product.
 
 ## Design Specification
 
